@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate://schemas/troubleshooting/implementation_manifest_v1",
+  "title": "Estate implementation manifest v1",
+  "type": "object",
+  "required": ["manifest_version", "generated_at", "repository", "repository_revision", "branch", "dirty_state", "worktree_identity", "artifact_roots", "exclusion_rules", "artifacts"],
+  "properties": {
+    "manifest_version": {"const": "1.0.0"},
+    "artifacts": {"type": "array", "items": {"type": "object", "required": ["path", "artifact_type", "content_hash", "git_blob_sha", "state", "component_id", "component_version"]}}
+  }
+}

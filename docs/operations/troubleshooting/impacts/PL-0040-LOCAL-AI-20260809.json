@@ -1,0 +1,145 @@
+{
+  "activation_restart_impact": "No daemon or scheduler restart; the worker is operator-invoked and uses the existing local Ollama service and SQLite projection.",
+  "author_provenance": {
+    "actor": "Pat / Steward authorized Codex",
+    "kind": "HUMAN"
+  },
+  "behavior_after": "The existing owner checks loopback Ollama, selects bounded authorized batches, sends packet-only prompts, parses and validates structured candidate output, classifies evidence quality, persists provenance without canonical mutation, and exposes review-required work.",
+  "behavior_before": "The governed population owner could create packets and ingest candidate results, but had no operator-invoked real local inference worker, provider health command, structured response parser, or quality outcome classification.",
+  "change_id": "PL-0040-LOCAL-AI-20260809",
+  "changed_artifacts": [
+    {
+      "head_git_blob": "HEAD:src/estate/core/estate_comprehension_worker.py",
+      "path": "src/estate/core/estate_comprehension_worker.py",
+      "sha256": "e5f94568af27ee18612a7564bf4b0e7ed254c227c5d4500c5b0c5c6e50871b0a",
+      "state": "UNTRACKED",
+      "worktree_git_blob": "9e6a802ff970598812303cf208696c7beb904960",
+      "worktree_state": "untracked"
+    },
+    {
+      "head_git_blob": "293c50de636f293fa4a7966549a97a00506198ba",
+      "path": "src/estate/core/estate_population.py",
+      "sha256": "a488e4944b5ced46e2c00bc6062fc8bb94b45224c9e76dd06c4bb8bee1d22682",
+      "state": "DIRTY",
+      "worktree_git_blob": "44b650cef4dc254f7a2098ffe4ef4a584c45e3a8",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "24e2f30acf147b1814637fd96b757eb2a1f747a6",
+      "path": "src/estate/cli/main.py",
+      "sha256": "a2673e50cde7fd04d9f62d330e0dad0dc9dc8061fb1187d5b684f76393a90eb3",
+      "state": "DIRTY",
+      "worktree_git_blob": "cb9160110a04b658481b84459c6cc2e4f857940d",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "3adc5d24ae61415a98285e9aec9b10017685a4e3",
+      "path": "schemas/troubleshooting/comprehension_result_v1.schema.json",
+      "sha256": "79770dba534427ba74f655d46900732b94c6d0b5fed6e94ebec4f5a619a71c16",
+      "state": "DIRTY",
+      "worktree_git_blob": "76eac12b1dcae2989b6cb559c42f8cae2a9b171a",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "HEAD:tests/test_estate_comprehension_worker.py",
+      "path": "tests/test_estate_comprehension_worker.py",
+      "sha256": "e1f94ca2a833b641a1ba34969e2cc2b718b83414208a4ef6ef5434d1b929a0e9",
+      "state": "UNTRACKED",
+      "worktree_git_blob": "c88db97b1fbd14229ace74cd2c29635617920a62",
+      "worktree_state": "untracked"
+    },
+    {
+      "head_git_blob": "86fb00d1e1abaacecc0f48c4e43f421428b7d765",
+      "path": "collaboration/parking_lot/PL-0040-estate-cookbook-troubleshooting.md",
+      "sha256": "19a2f3d00c9ff7367f20a1ce5b5c371c0bf8af0ec91b765b966ecf2650485619",
+      "state": "DIRTY",
+      "worktree_git_blob": "8535861521734a8c5d2fd524dfe95b116e717dd6",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "cfb542f3bd6edf2343c1218e111d5c4a930ebd80",
+      "path": "operations/boards/parking_lot_items/PL-0040_ESTATE_COOKBOOK_TROUBLESHOOTING.md",
+      "sha256": "4d93e44fa931e21fdef7d1602ac2fc6669243c961280ca2deee0cd93bf7c5133",
+      "state": "DIRTY",
+      "worktree_git_blob": "8a117ad79058550bd8c9f5055bb9980089f2edfd",
+      "worktree_state": "dirty"
+    }
+  ],
+  "changed_components": [
+    "estate_governed_population",
+    "estate_local_comprehension_worker",
+    "estate_diagnostics_cli"
+  ],
+  "changed_failure_modes": [
+    "provider failures become retry/review outcomes rather than silent deterministic fallback"
+  ],
+  "changed_files": [
+    "src/estate/core/estate_comprehension_worker.py",
+    "src/estate/core/estate_population.py",
+    "src/estate/cli/main.py",
+    "schemas/troubleshooting/comprehension_result_v1.schema.json",
+    "tests/test_estate_comprehension_worker.py",
+    "collaboration/parking_lot/PL-0040-estate-cookbook-troubleshooting.md",
+    "operations/boards/parking_lot_items/PL-0040_ESTATE_COOKBOOK_TROUBLESHOOTING.md"
+  ],
+  "changed_schemas": [
+    "schemas/troubleshooting/comprehension_result_v1.schema.json"
+  ],
+  "confidence": "CANDIDATE",
+  "dependencies_called": [
+    "Ollama /api/tags",
+    "Ollama /api/generate",
+    "existing diagnostics CLI",
+    "SQLite candidate ingestion"
+  ],
+  "dependencies_read": [
+    "existing LocalOllamaAdapter",
+    "existing population scope and SQLite owner",
+    "existing provider health and model-control boundaries"
+  ],
+  "estate_change_id": "PL-0040-GOVERNED-LOCAL-AI-COMPREHENSION",
+  "expected_inputs": [
+    "existing SQLite population queue",
+    "governed provider packet",
+    "loopback Ollama model"
+  ],
+  "expected_outputs": [
+    "provider health evidence",
+    "quality-classified candidate result",
+    "candidate interpretation provenance",
+    "review/retry state"
+  ],
+  "implementation_revision": "WORKTREE",
+  "new_failure_modes": [
+    "provider unavailable",
+    "malformed structured output",
+    "unsupported certainty or evidence reference",
+    "bounded local inference timeout"
+  ],
+  "packet_version": "1.0.0",
+  "preliminary_troubleshooting_notes": [
+    "A provider timeout or malformed response remains candidate/retry evidence; do not widen scope or authorize remediation. Inspect the exact batch and provider diagnostics before retrying."
+  ],
+  "prohibited_recovery_actions": [
+    "Do not let local AI add paths, browse outside the packet, mutate canonical knowledge, advance accepted baselines, restart/reset hardware, or authorize remediation."
+  ],
+  "recommended_checkpoint_impacts": [
+    "LD-RECONCILIATION",
+    "LD-DEVELOPER-INGESTION"
+  ],
+  "resources_written": [
+    "runtime/search/estate_knowledge_index.sqlite3",
+    "candidate interpretation and batch telemetry"
+  ],
+  "source_revision": "WORKTREE",
+  "tests_added_or_changed": [
+    "tests/test_estate_comprehension_worker.py"
+  ],
+  "validation_evidence": [
+    "live loopback Ollama health discovered nine models",
+    "two real troubleshooting work units completed as ACCEPTED_CANDIDATE",
+    "67 focused diagnostics/population/index tests passed",
+    "provider authority and malformed/invented-result boundaries tested"
+  ],
+  "work_package_id": "PL-0040-LIVING-FOUNDATION"
+}

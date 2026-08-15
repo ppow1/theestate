@@ -1,0 +1,36 @@
+{
+  "packet_version": "1.0.0",
+  "change_id": "PL-0040-CONTROLLED-LEVEL1-SCALE-20260810",
+  "work_package_id": "PL-0040-LIVING-FOUNDATION",
+  "estate_change_id": "PL-0040-CONTROLLED-LEVEL1-PRODUCTION-SCALE-ACCEPTANCE",
+  "author_provenance": {"kind": "HUMAN", "actor": "Pat / Steward-authorized Codex"},
+  "changed_files": [
+    "collaboration/parking_lot/PL-0040-estate-cookbook-troubleshooting.md",
+    "docs/operations/troubleshooting/impacts/PL-0040-CONTROLLED-LEVEL1-SCALE-20260810.request.json"
+  ],
+  "changed_components": ["estate_knowledge_index", "estate_population", "estate_comprehension_worker", "living_diagnostics"],
+  "changed_schemas": [],
+  "behavior_before": "The published evidence-enriched pipeline had proven positive Level-1 application on a small real sample, but materially larger multi-class production-scale behavior had not been tested.",
+  "behavior_after": "A bounded single-worker scale attempt processed five real engineering schemas, applied eleven independently corroborated low-risk assertions, and stopped after a later provider timeout before other classes were processed. No scheduler or unattended operation was enabled.",
+  "expected_inputs": ["admitted Level-1 assets", "revision-grounded deterministic evidence", "evidence-enriched provider packets", "existing review/application policy"],
+  "expected_outputs": ["class-specific production metrics", "application and coverage audit", "resume/checkpoint evidence", "DB health and stop-condition evidence"],
+  "dependencies_read": ["PL-0040", "Estate Knowledge Index v5", "governed population scope", "deterministic evidence engine", "evidence-enriched packet contract", "candidate governance/application", "published benchmark and positive-application packets"],
+  "dependencies_called": ["SQLite v5 runtime store", "admitted inventory", "Ollama local provider", "knowledge-index CLI"],
+  "resources_written": ["runtime/search/estate_knowledge_index.sqlite3 candidate, evidence, review, application, and coverage state"],
+  "new_failure_modes": ["single-provider latency can stop a bounded production checkpoint", "multi-class scale readiness cannot be inferred from a small schema-only sample"],
+  "changed_failure_modes": ["none; invalid citations, unsupported claims, provider authority, canonical promotion, and scheduler safeguards were unchanged"],
+  "tests_added_or_changed": [],
+  "validation_evidence": [
+    "published starting revision a874238f5f00072d245d3e614fe6fa09a80cfe9c passed 77 focused tests",
+    "five real schemas completed as validated candidates and one schema timed out after the bounded worker timeout; the timeout was recorded RETRYABLE_PROVIDER_FAILURE",
+    "17 assertions were extracted; 14 were independently corroborated or deterministically supported and 11 were eligible and applied after non-provider review",
+    "three summary assertions remained non-eligible; no invalid citation or unsupported positive claim was observed in the completed results",
+    "SQLite PRAGMA integrity_check returned ok; no canonical Cookbook or source files were mutated; pre-existing generated troubleshooting modifications remained untouched"
+  ],
+  "recommended_checkpoint_impacts": ["LD-RECONCILIATION", "LD-DEVELOPER-INGESTION"],
+  "prohibited_recovery_actions": ["provider self-approval", "retrying after material provider instability without review", "scheduler activation", "GPU stress or reset", "filesystem scope expansion", "source mutation, deletion, archival, or deprecation", "canonical promotion"],
+  "activation_restart_impact": "No service, daemon, scheduler, or runtime configuration changes.",
+  "source_revision": "a874238f5f00072d245d3e614fe6fa09a80cfe9c",
+  "implementation_revision": "a874238f5f00072d245d3e614fe6fa09a80cfe9c",
+  "confidence": "CANDIDATE"
+}

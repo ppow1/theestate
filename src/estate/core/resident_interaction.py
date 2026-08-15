@@ -1,7 +1,7 @@
 """Reusable local resident interaction framework for chat, surfaces, and memory governance."""
 from __future__ import annotations
 
-import base64, hashlib, json, os, re, shutil, subprocess
+import base64, hashlib, json, os, re, shutil, subprocess, time
 import socket
 import urllib.request
 from datetime import datetime, timezone
@@ -89,27 +89,33 @@ class LocalOllamaAdapter:
         return models[0] if models else None
 
     def generate(self, *, resident: str, prompt: str, model: str | None = None) -> dict[str, Any]:
+        discovery_started = time.perf_counter()
         discovery = self.discover_models()
+        discovery_duration_ms = round((time.perf_counter() - discovery_started) * 1000, 2)
         if not discovery.get("available"):
-            return {"ok": False, "text": None, "metadata": _llm_metadata("deterministic_fallback", provider=self.provider, model=model, endpoint=self.endpoint, fallback_used=True, fallback_reason=discovery.get("discovery"), discovered_models_count=len(discovery.get("models") or []), generation_result_state="not_attempted", timeout_seconds=self.timeout, prompt_summary=_prompt_summary(prompt))}
+            return {"ok": False, "text": None, "metadata": _llm_metadata("deterministic_fallback", provider=self.provider, model=model, endpoint=self.endpoint, fallback_used=True, fallback_reason=discovery.get("discovery"), discovered_models_count=len(discovery.get("models") or []), generation_result_state="not_attempted", timeout_seconds=self.timeout, prompt_summary=_prompt_summary(prompt), discovery_duration_ms=discovery_duration_ms, timeout_phase="PROVIDER_DISCOVERY" if not discovery.get("available") else None)}
         selected = model or self.select_model(resident, discovery.get("models") or [])
         if not selected:
-            return {"ok": False, "text": None, "metadata": _llm_metadata("local_llm_discovered_but_generation_failed", provider=self.provider, endpoint=self.endpoint, fallback_used=True, fallback_reason="No usable local Ollama model selected", discovered_models_count=len(discovery.get("models") or []), generation_result_state="model_selection_failed", timeout_seconds=self.timeout, prompt_summary=_prompt_summary(prompt))}
+            return {"ok": False, "text": None, "metadata": _llm_metadata("local_llm_discovered_but_generation_failed", provider=self.provider, endpoint=self.endpoint, fallback_used=True, fallback_reason="No usable local Ollama model selected", discovered_models_count=len(discovery.get("models") or []), generation_result_state="model_selection_failed", timeout_seconds=self.timeout, prompt_summary=_prompt_summary(prompt), discovery_duration_ms=discovery_duration_ms, timeout_phase="MODEL_SELECTION")}
         body = json.dumps({"model": selected, "prompt": prompt, "stream": False, "options": {"temperature": 0.2}}).encode("utf-8")
         req = urllib.request.Request(f"{self.endpoint}/api/generate", data=body, headers={"Content-Type": "application/json"}, method="POST")
+        request_started_at = _now()
+        request_started = time.perf_counter()
         try:
             with urllib.request.urlopen(req, timeout=self.timeout) as response:
-                payload = json.loads(response.read().decode("utf-8"))
+                raw = response.read()
+                response_received_at = _now()
+                payload = json.loads(raw.decode("utf-8"))
             text = str(payload.get("response") or "").strip()
             if not text:
                 raise RuntimeError("Ollama returned an empty response")
-            return {"ok": True, "text": text, "metadata": _llm_metadata("local_llm_generated", provider=self.provider, model=selected, endpoint=self.endpoint, fallback_used=False, fallback_reason=None, generation_attempted=True, generation_endpoint=f"{self.endpoint}/api/generate", generation_result_state="succeeded", discovered_models_count=len(discovery.get("models") or []), timeout_seconds=self.timeout, prompt_summary=_prompt_summary(prompt))}
+            return {"ok": True, "text": text, "metadata": _llm_metadata("local_llm_generated", provider=self.provider, model=selected, endpoint=self.endpoint, fallback_used=False, fallback_reason=None, generation_attempted=True, generation_endpoint=f"{self.endpoint}/api/generate", generation_result_state="succeeded", discovered_models_count=len(discovery.get("models") or []), timeout_seconds=self.timeout, prompt_summary=_prompt_summary(prompt), discovery_duration_ms=discovery_duration_ms, request_started_at=request_started_at, request_duration_ms=round((time.perf_counter() - request_started) * 1000, 2), timeout_phase="COMPLETED", response_bytes=len(raw), first_response_at=response_received_at)}
         except Exception as exc:
             timed_out = isinstance(exc, TimeoutError) or isinstance(exc, socket.timeout) or "timed out" in str(exc).lower()
             result = "timeout" if timed_out else "failed"
             reason = f"Local Ollama invocation timed out after {self.timeout:g} seconds" if timed_out else f"Local Ollama invocation failed: {exc}"
             hint = "Retry after the model is warm, or increase ESTATE_ALFRED_OLLAMA_TIMEOUT_SECONDS for first-run Windows/Ollama cold loads." if timed_out else "Check Ollama logs, model availability, and the local /api/generate endpoint."
-            return {"ok": False, "text": None, "metadata": _llm_metadata("local_llm_discovered_but_generation_failed", provider=self.provider, model=selected, endpoint=self.endpoint, fallback_used=True, fallback_reason=reason, generation_attempted=True, generation_endpoint=f"{self.endpoint}/api/generate", generation_result_state=result, discovered_models_count=len(discovery.get("models") or []), sanitized_error=f"{type(exc).__name__}: {exc}", timeout_seconds=self.timeout, prompt_summary=_prompt_summary(prompt), recovery_hint=hint)}
+            return {"ok": False, "text": None, "metadata": _llm_metadata("local_llm_discovered_but_generation_failed", provider=self.provider, model=selected, endpoint=self.endpoint, fallback_used=True, fallback_reason=reason, generation_attempted=True, generation_endpoint=f"{self.endpoint}/api/generate", generation_result_state=result, discovered_models_count=len(discovery.get("models") or []), sanitized_error=f"{type(exc).__name__}: {exc}", timeout_seconds=self.timeout, prompt_summary=_prompt_summary(prompt), recovery_hint=hint, discovery_duration_ms=discovery_duration_ms, request_started_at=request_started_at, request_duration_ms=round((time.perf_counter() - request_started) * 1000, 2), timeout_phase="GENERATION_TIMEOUT" if timed_out else "GENERATION_FAILED")}
 
 
 IMAGE_MIME_EXT = {"image/png": ".png", "image/jpeg": ".jpg", "image/webp": ".webp", "image/gif": ".gif"}
@@ -247,10 +253,10 @@ def create_attachment(root: Path, resident: str, sid: str, item: dict[str, Any],
         raise ValueError("attachment storage escaped bounded directory")
     return {"attachment_id": aid, "kind": kind, "source": source, "created_at": _now(), "original_filename": _safe(item.get("original_filename") or path.name), "mime_type": mime, "size_bytes": len(raw), "storage_path": rel, "sha256": hashlib.sha256(raw).hexdigest(), "redaction_status": "active", "vision_status": vstatus, "vision_provider": vprovider, "vision_model": vmodel, "summary": summary}
 
-def _llm_metadata(mode: str, *, provider="none", model=None, endpoint=None, fallback_used=False, fallback_reason=None, generation_attempted=False, generation_endpoint=None, generation_result_state="not_attempted", discovered_models_count=0, sanitized_error=None, prompt_summary=None, timeout_seconds=None, recovery_hint=None):
+def _llm_metadata(mode: str, *, provider="none", model=None, endpoint=None, fallback_used=False, fallback_reason=None, generation_attempted=False, generation_endpoint=None, generation_result_state="not_attempted", discovered_models_count=0, sanitized_error=None, prompt_summary=None, timeout_seconds=None, recovery_hint=None, discovery_duration_ms=None, request_started_at=None, request_duration_ms=None, timeout_phase=None, response_bytes=None, first_response_at=None):
     generation_result = "succeeded" if generation_result_state in {"generated", "succeeded"} else generation_result_state
     public_mode = "local_llm" if mode in {"local_llm_generated", "local_llm"} else mode
-    return {"mode": public_mode, "provider": provider or "none", "model": model, "endpoint": endpoint, "fallback_used": bool(fallback_used), "fallback_reason": _safe_diagnostic_text(fallback_reason), "generation_attempted": bool(generation_attempted), "generation_endpoint": generation_endpoint, "generation_result_state": generation_result, "generation_result": generation_result, "timeout_seconds": timeout_seconds, "discovered_models_count": int(discovered_models_count or 0), "sanitized_error": _safe_diagnostic_text(sanitized_error), "prompt_summary": _safe_diagnostic_text(prompt_summary), "prompt_size": _prompt_size(prompt_summary), "recovery_hint": _safe_diagnostic_text(recovery_hint)}
+    return {"mode": public_mode, "provider": provider or "none", "model": model, "endpoint": endpoint, "fallback_used": bool(fallback_used), "fallback_reason": _safe_diagnostic_text(fallback_reason), "generation_attempted": bool(generation_attempted), "generation_endpoint": generation_endpoint, "generation_result_state": generation_result, "generation_result": generation_result, "timeout_seconds": timeout_seconds, "discovered_models_count": int(discovered_models_count or 0), "sanitized_error": _safe_diagnostic_text(sanitized_error), "prompt_summary": _safe_diagnostic_text(prompt_summary), "prompt_size": _prompt_size(prompt_summary), "recovery_hint": _safe_diagnostic_text(recovery_hint), "discovery_duration_ms": discovery_duration_ms, "request_started_at": request_started_at, "request_duration_ms": request_duration_ms, "timeout_phase": timeout_phase, "response_bytes": response_bytes, "first_response_at": first_response_at}
 
 RESIDENT_PROFILES = {
     "alfred": {"resident_id":"alfred","resident_display_name":"Alfred","office":"Office of Operations","role":"Operational resident coordinator","implementation_version":"alfred-operations-implementation-v1"},

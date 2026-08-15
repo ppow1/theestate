@@ -1,0 +1,14 @@
+{
+  "job_id": "living_diagnostics_full_reconciliation",
+  "owner": "operations_scheduler",
+  "schedule": {"kind": "daily", "local_time": "06:00", "timezone": "ESTATE_LOCAL"},
+  "runtime_mode": "living-diagnostics-reconcile",
+  "command_equivalent": ["python", "tools/estate_diagnostics.py", "reconcile", "--accepted-manifest", "operations/diagnostics/accepted-implementation-manifest.json"],
+  "provider_dependency": "NONE",
+  "notification_policy": "material_exceptions_only",
+  "unchanged_outcomes": ["IMPLEMENTATION_UNCHANGED", "COOKBOOK_CURRENT"],
+  "state": "ACTIVE_IN_CANONICAL_OPERATIONS_SCHEDULER",
+  "implementation": "src/estate/core/operations_scheduler.py::DEFAULT_JOBS",
+  "execution_adapter": "src/estate/core/operations_scheduler_runtime.py::OperationsSchedulerRuntime.run_due",
+  "note": "The existing scheduler owns timing, leases, retry state, status, and execution; no duplicate scheduler or provider is introduced."
+}

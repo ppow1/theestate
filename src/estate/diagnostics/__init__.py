@@ -1,5 +1,6 @@
-"""Deterministic Living Diagnostics developer-ingestion surface."""
+"""Provider-neutral Estate living diagnostics."""
 
-from .impact import create_packet, reconcile
+from .living import DiagnosticsRepository, build, reconcile
+from .comprehension import ComprehensionError, build_model, comprehension_packet, query_model, render_mermaid, validate_model
 
-__all__ = ["create_packet", "reconcile"]
+__all__ = ["DiagnosticsRepository", "build", "reconcile", "ComprehensionError", "build_model", "comprehension_packet", "query_model", "render_mermaid", "validate_model"]

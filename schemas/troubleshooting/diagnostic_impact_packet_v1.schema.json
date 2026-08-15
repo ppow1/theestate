@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate://schemas/troubleshooting/diagnostic_impact_packet_v1",
+  "title": "Provider-neutral Diagnostic Impact Packet v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["packet_version", "change_id", "author_provenance", "changed_files", "source_revision", "confidence"],
+  "properties": {
+    "packet_version": {"const": "1.0.0"},
+    "change_id": {"type": "string", "minLength": 1, "maxLength": 200, "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,199}$"},
+    "work_package_id": {"type": ["string", "null"], "maxLength": 200},
+    "estate_change_id": {"type": ["string", "null"], "maxLength": 200},
+    "author_provenance": {
+      "type": "object", "additionalProperties": true, "required": ["kind"],
+      "properties": {"kind": {"type": "string", "enum": ["DETERMINISTIC", "LOCAL_AI", "EXTERNAL_AI", "HUMAN", "MIXED"]}}
+    },
+    "changed_files": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\\\).+$"}},
+    "changed_artifacts": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["path", "sha256", "head_git_blob", "worktree_git_blob", "state"], "properties": {"path": {"type": "string"}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}, "head_git_blob": {"type": ["string", "null"]}, "worktree_git_blob": {"type": ["string", "null"]}, "state": {"enum": ["CLEAN", "DIRTY", "UNTRACKED"]}}},
+    "changed_components": {"$ref": "#/$defs/stringArray"}, "changed_interfaces": {"$ref": "#/$defs/stringArray"}, "changed_schemas": {"$ref": "#/$defs/stringArray"},
+    "behavior_before": {}, "behavior_after": {}, "expected_inputs": {"$ref": "#/$defs/stringArray"}, "expected_outputs": {"$ref": "#/$defs/stringArray"},
+    "dependencies_read": {"$ref": "#/$defs/stringArray"}, "dependencies_called": {"$ref": "#/$defs/stringArray"}, "resources_written": {"$ref": "#/$defs/stringArray"},
+    "new_failure_modes": {"type": "array"}, "changed_failure_modes": {"type": "array"}, "removed_failure_modes": {"type": "array"},
+    "new_or_changed_logs": {"type": "array"}, "new_or_changed_status_codes": {"type": "array"}, "tests_added_or_changed": {"type": "array"},
+    "validation_evidence": {"type": "array"}, "recommended_checkpoint_impacts": {"type": "array"}, "preliminary_troubleshooting_notes": {"type": "array"}, "prohibited_recovery_actions": {"type": "array"},
+    "activation_restart_impact": {}, "source_revision": {"type": "string", "minLength": 1}, "implementation_revision": {"type": "string", "minLength": 1},
+    "confidence": {"enum": ["PROVEN", "SUPPORTED", "CANDIDATE", "UNKNOWN"]}
+  },
+  "$defs": {"stringArray": {"type": "array", "uniqueItems": true, "items": {"type": "string"}}}
+}

@@ -1,0 +1,84 @@
+{
+  "change_id": "PL-0040-LEVEL1-QUALIFICATION-MATRIX-20260810",
+  "source_parking_lot": "PL-0040",
+  "source_revision": "32af6cd89f4e0036945327b282990619d66f79e9",
+  "database": {
+    "schema": "estate.knowledge_store.v7",
+    "integrity_check": "ok",
+    "attempts": 36,
+    "escalations": 2,
+    "applied_assertions_total": 47,
+    "active_applied_assertions": 44,
+    "application_history": 50,
+    "evidence_facts": 41636,
+    "new_evidence_facts_since_recovery": 174,
+    "wal_bytes": 0,
+    "active_work_units": 0,
+    "historical_retryable_work_units": 6
+  },
+  "checkpoint": {
+    "migration_units": {
+      "population": 2,
+      "current_qualification_attempts": 4,
+      "accepted": 2,
+      "invalid": 2,
+      "timeouts": 0,
+      "escalations": 0,
+      "valid_result_rate": "2/4 (50%)",
+      "accepted_assertions_corroborated": "7/7 (100%)",
+      "unsupported_positive_assertions_admitted": 0,
+      "note": "Both migration assets were deterministically refreshed. qwen3-coder validated both current assets; qwen3:8b failed both on unauthorized assertion kinds. Invalid raw output was preserved and not admitted."
+    },
+    "documentation_units": {
+      "accepted": 5,
+      "invalid": 0,
+      "timeouts": 0,
+      "escalations": 0,
+      "provider_models": ["qwen3-coder:30b-qwencode-20k"]
+    },
+    "provider_latency": {
+      "documentation_seconds_observed": [6.848, 7.197, 7.622, 8.653, 12.898],
+      "migration_seconds_observed_prior": [2.731, 15.655, 38.892],
+      "migration_seconds_observed_current": [17.197, 16.466, 16.798, 7.531],
+      "provider_timeouts": 0
+    }
+  },
+  "matrix": {
+    "JSON_SCHEMA": {
+      "primary_model": "qwen3-coder:30b-qwencode-20k",
+      "fallback_model": "qwen3:8b",
+      "readiness": "LOCAL_AI_WITH_REVIEW",
+      "basis": "Existing qualified coder evidence plus preserved bounded comparison evidence."
+    },
+    "SIMPLE_CONFIGURATION": {
+      "primary_model": "qwen3:8b",
+      "fallback_model": "qwen3-coder:30b-qwencode-20k",
+      "readiness": "LOCAL_AI_WITH_REVIEW",
+      "basis": "Existing persisted two-model control sample and review-qualified routing."
+    },
+    "REGISTRIES_CONTRACTS": {
+      "primary_model": "qwen3-coder:30b-qwencode-20k",
+      "fallback_model": "qwen3:8b",
+      "readiness": "LOCAL_AI_WITH_REVIEW",
+      "basis": "Coder primary; qwen3:8b remains DISALLOWED_FOR_CLASS after preserved citation failures."
+    },
+    "MIGRATIONS": {
+      "primary_model": "qwen3-coder:30b-qwencode-20k",
+      "fallback_model": "qwen3:8b",
+      "fallback_state": "DISALLOWED_FOR_CLASS",
+      "readiness": "LOCAL_AI_WITH_REVIEW",
+      "basis": "Coder validated all 2 current admitted migration assets with packet-local authorized citations; qwen3:8b produced 2/2 invalid current results and is not an operational fallback."
+    },
+    "DOCUMENTATION": {
+      "primary_model": "qwen3-coder:30b-qwencode-20k",
+      "fallback_model": "qwen3:8b",
+      "readiness": "LOCAL_AI_WITH_REVIEW",
+      "basis": "Five accepted bounded candidates from actual admitted documentation assets; fallback not yet independently sampled."
+    }
+  },
+  "scheduled_level1": "SCHEDULED_LEVEL1_WARRANTED",
+  "canonical_mutation": false,
+  "scheduler_activated": false,
+  "gpu_or_windows_changes": false,
+  "confidence": "GOVERNED_BOUNDED_CHECKPOINT"
+}

@@ -60,3 +60,107 @@ Still incremental/future: Estate-wide checkpoint population, an autonomous
 overnight local-AI reviewer, universal deterministic probes, autonomous Grace
 cookbook consultation, and automatic remediation. This update does not close
 PL-0040 or authorize those capabilities.
+
+## Structured knowledge slice (2026-08-09)
+
+The existing PL-0040 lane now includes a provider-neutral operational knowledge
+contract for typed incident/troubleshooting records and governed lifecycle
+states. Candidate knowledge is separate from canonical checkpoints; promotion
+requires evidence and local AI cannot perform it. The Tesla P100/RTX 4090
+incident is the first acceptance fixture, including the separate WinError 1224
+harness failure and unresolved 0x133 forensics. Estate-wide population,
+autonomous consultation, remediation, and the PL-0042 investigation remain
+future work.
+
+## Estate comprehension infrastructure slice (2026-08-09)
+
+The existing PL-0040 diagnostics owner now provides a normalized,
+revision-grounded comprehension model for Living Diagnostics, Grace
+reasoning-to-execution, and Operations Scheduler reconciliation. It preserves
+evidence-qualified relationships, workflows, checkpoints, failure seams,
+Cookbook references, deterministic Mermaid views, bounded provider-neutral
+packets, and source-change revalidation state.
+
+The packet boundary remains proposal-only and cannot mutate canonical truth,
+advance an accepted baseline, promote knowledge, or authorize remediation.
+This milestone proves bounded comprehension infrastructure only; it does not
+perform Estate-wide population or close PL-0040.
+
+## Indexed institutional knowledge infrastructure slice (2026-08-09)
+
+The existing PL-0040 owner now includes a migration-governed SQLite projection
+for bounded deterministic repository inventory, scan/resume state, provenance,
+ownership/purpose/tag classification, relational component/workflow/checkpoint
+and failure-seam links, coverage, lifecycle assessment, staleness, graph views,
+and bounded provider-neutral packets. The database is runtime-generated and
+rebuildable; Git and governed artifacts remain authoritative.
+
+This milestone supports controlled indexed population but does not perform
+Estate-wide population, autonomous provider review, canonical promotion,
+resident API exposure, or remediation. PL-0040 remains open for those later
+milestones.
+
+## Governed population and resumable worker slice (2026-08-09)
+
+The existing lane now has a versioned repository population scope and a
+deterministic pre-traversal enforcement boundary. The first admitted inventory
+completed over 5,827 assets while excluding generated/runtime/evidence/Git
+internals and limiting data/archive/resident material to metadata or no-content
+policies.
+
+SQLite migration 2 adds scope boundaries, resumable comprehension batches,
+provider-result provenance, and candidate interpretation history. Work packets
+are selected by the Estate, contain only assigned structural assets, and cannot
+be expanded by a provider. Result ingestion is fail-closed, idempotent for
+identical output, conflict-preserving, and permanently candidate-only pending
+governed review. This does not authorize unattended local-AI population,
+canonical promotion, resident service exposure, or remediation.
+
+## Governed local-AI comprehension operations (2026-08-09)
+
+The existing owner now provides a bounded `knowledge-index work-run`
+operation over the already-admitted queue. It reuses the loopback Ollama
+provider, performs a live health/model check, sends only Estate-built packets,
+requires structured candidate JSON, validates evidence and assigned identity,
+and records model/source provenance and quality outcome. The first real run
+completed two troubleshooting work units as accepted candidates requiring
+human review. Local AI remains a provider, not an authority: scope expansion,
+canonical promotion, baseline advancement, remediation, and unattended
+recurring scheduling remain prohibited.
+
+## Local-AI quality benchmark and controlled burn-down (2026-08-09)
+
+Real admitted schemas, implementation, diagnostics, and ambiguous parking-lot
+material were benchmarked through the existing Ollama-backed worker. Level 1
+schema work is routed `ROUTINE_LOCAL_AI`; Level 2 and the small Level 3 sample
+are `LOCAL_AI_WITH_REVIEW`; Level 4 remains
+`ESCALATE_TO_STRONGER_REASONING`. Three real Level 1 schema candidates were
+processed with no canonical promotion. The benchmark report and Diagnostic
+Impact Packet preserve the observed conflicts, stale-packet rejections,
+timeout, throughput, and coverage delta. No unattended scheduling or
+remediation is authorized.
+
+## Governed candidate application slice (2026-08-09)
+
+The existing SQLite knowledge-index owner now normalizes candidate fields into
+assertions, records deterministic corroboration and evidence strength, stores
+review decisions, and applies only low-risk corroborated assertions through a
+transactional non-canonical projection. Provider results remain immutable;
+provider identities cannot review or apply their own output. Application
+history records prior/new values and supports reversal, conflict blocking,
+source-change revalidation, and resident-neutral retrieval. Coverage advances
+only from applied indexed purpose/owner state; candidate generation and
+schema-valid provider output do not advance it. No Level-2, Level-3, or
+Level-4 candidate is processed by the Level-1 burn-down, and no recurring
+scheduler is enabled.
+
+## Deterministic corroboration expansion (2026-08-09)
+
+The SQLite owner now stores reusable revision-grounded evidence facts and
+assertion-to-fact links. Schema metadata/structure, Python static structure,
+explicit source/test/documentation references, deterministic ownership,
+component mappings, and derived schema tags are extracted from admitted
+inventory assets. Provider-derived candidate material cannot become evidence.
+Facts retain source hashes and stale state; the evidence and corroboration CLI
+surfaces expose why an assertion is supported or remains an exception. The
+five real Level-1 assertions were rerun unchanged and remained unverifiable.

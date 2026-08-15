@@ -55,6 +55,13 @@ Read:
 
 `AI_START_HERE.md`
 
+### Something is broken or implementation freshness is uncertain?
+
+Start with `docs/operations/troubleshooting/README.md`. The provider-neutral
+query is `python tools/estate_diagnostics.py search "symptom"`; local HTML is
+`docs/operations/troubleshooting/generated/index.html`, and `version-status`
+reports the exact repository/worktree artifact context.
+
 ## Guardrails
 
 - Do not redesign the Estate merely because context was lost.

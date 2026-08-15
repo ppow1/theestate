@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate://schemas/troubleshooting/comprehension_model_v1",
+  "title": "Estate Troubleshooting Comprehension Model v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "model_id", "components", "relationships", "workflows", "checkpoints", "failure_seams"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "model_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,199}$"},
+    "components": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/component"}},
+    "relationships": {"type": "array", "items": {"$ref": "#/$defs/relationship"}},
+    "workflows": {"type": "array", "items": {"$ref": "#/$defs/workflow"}},
+    "checkpoints": {"type": "array", "items": {"$ref": "#/$defs/checkpoint"}},
+    "failure_seams": {"type": "array", "items": {"$ref": "#/$defs/seam"}}
+  },
+  "$defs": {
+    "id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,199}$"},
+    "strings": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "component": {
+      "type": "object", "additionalProperties": false,
+      "required": ["component_id", "title", "class", "owner", "source_paths", "inputs", "outputs", "dependencies", "health_evidence", "activation_boundary", "checkpoint_ids", "knowledge_refs"],
+      "properties": {
+        "component_id": {"$ref": "#/$defs/id"}, "title": {"type": "string", "minLength": 1},
+        "class": {"type": "string", "minLength": 1}, "owner": {"type": "string", "minLength": 1},
+        "source_paths": {"$ref": "#/$defs/strings"}, "inputs": {"$ref": "#/$defs/strings"},
+        "outputs": {"$ref": "#/$defs/strings"}, "dependencies": {"$ref": "#/$defs/strings"},
+        "health_evidence": {"$ref": "#/$defs/strings"}, "activation_boundary": {"type": "string", "minLength": 1},
+        "checkpoint_ids": {"$ref": "#/$defs/strings"}, "knowledge_refs": {"$ref": "#/$defs/strings"}
+      }
+    },
+    "relationship": {
+      "type": "object", "additionalProperties": false,
+      "required": ["relationship_id", "source", "target", "kind", "certainty", "evidence_refs"],
+      "properties": {
+        "relationship_id": {"$ref": "#/$defs/id"}, "source": {"$ref": "#/$defs/id"}, "target": {"$ref": "#/$defs/id"},
+        "kind": {"enum": ["calls", "invokes", "reads", "writes", "publishes", "consumes", "schedules", "owns", "locks", "routes", "persists_to", "reconciles", "observes", "validates", "depends_on"]},
+        "certainty": {"enum": ["DETERMINISTIC", "DOCUMENTED", "INFERRED"]}, "evidence_refs": {"$ref": "#/$defs/strings"}
+      }
+    },
+    "workflow": {
+      "type": "object", "additionalProperties": false,
+      "required": ["workflow_id", "title", "component_ids", "checkpoint_ids", "source_paths"],
+      "properties": {"workflow_id": {"$ref": "#/$defs/id"}, "title": {"type": "string", "minLength": 1}, "component_ids": {"$ref": "#/$defs/strings"}, "checkpoint_ids": {"$ref": "#/$defs/strings"}, "source_paths": {"$ref": "#/$defs/strings"}}
+    },
+    "checkpoint": {
+      "type": "object", "additionalProperties": false,
+        "required": ["checkpoint_id", "workflow_id", "component_id", "sequence", "expected_input", "transition", "expected_output", "evidence_source", "probe", "success_criteria", "failure_indicators", "safe_boundary", "verification", "escalation", "source_paths", "knowledge_refs"],
+      "properties": {
+        "checkpoint_id": {"$ref": "#/$defs/id"}, "workflow_id": {"$ref": "#/$defs/id"}, "component_id": {"$ref": "#/$defs/id"},
+        "sequence": {"type": "integer", "minimum": 1}, "expected_input": {"type": "string", "minLength": 1},
+        "transition": {"type": "string", "minLength": 1}, "expected_output": {"type": "string", "minLength": 1},
+        "evidence_source": {"type": "string", "minLength": 1}, "probe": {"type": "string", "minLength": 1},
+        "success_criteria": {"type": "string", "minLength": 1}, "failure_indicators": {"$ref": "#/$defs/strings"},
+        "safe_boundary": {"type": "string", "minLength": 1}, "verification": {"type": "string", "minLength": 1},
+        "escalation": {"type": "string", "minLength": 1}, "source_paths": {"$ref": "#/$defs/strings"}, "knowledge_refs": {"$ref": "#/$defs/strings"}
+      }
+    },
+    "seam": {
+      "type": "object", "additionalProperties": false,
+      "required": ["seam_id", "title", "classification", "certainty", "workflow_id", "checkpoint_ids", "component_ids", "symptoms", "distinguishing_probes", "risky_actions", "stop_conditions", "evidence_refs", "knowledge_refs", "validation_state"],
+      "properties": {
+        "seam_id": {"$ref": "#/$defs/id"}, "title": {"type": "string", "minLength": 1},
+        "classification": {"enum": ["implementation_invariant", "dependency_absence", "provider_boundary", "process_ownership", "queue_transition", "filesystem", "timeout", "observer_effect", "configuration_drift", "hardware_runtime", "output_persistence", "downstream_rejection"]},
+        "certainty": {"enum": ["DETERMINISTIC", "CANDIDATE", "HISTORICAL"]}, "workflow_id": {"$ref": "#/$defs/id"},
+        "checkpoint_ids": {"$ref": "#/$defs/strings"}, "component_ids": {"$ref": "#/$defs/strings"}, "symptoms": {"$ref": "#/$defs/strings"},
+        "distinguishing_probes": {"$ref": "#/$defs/strings"}, "risky_actions": {"$ref": "#/$defs/strings"}, "stop_conditions": {"$ref": "#/$defs/strings"},
+        "evidence_refs": {"$ref": "#/$defs/strings"}, "knowledge_refs": {"$ref": "#/$defs/strings"},
+        "validation_state": {"enum": ["UNVALIDATED", "CANDIDATE", "VALIDATED", "STALE", "REVALIDATION_REQUIRED"]}
+      }
+    }
+  }
+}

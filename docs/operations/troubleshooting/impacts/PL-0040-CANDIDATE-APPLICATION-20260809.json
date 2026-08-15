@@ -1,0 +1,179 @@
+{
+  "activation_restart_impact": "No daemon or scheduler is changed. Existing store opens migrate to schema v3; no restart is required.",
+  "author_provenance": {
+    "actor": "Steward-authorized Codex",
+    "kind": "HUMAN"
+  },
+  "behavior_after": "The existing knowledge-index owner extracts assertions, corroborates deterministic evidence, routes review, applies only eligible low-risk assertions to a non-canonical projection, records history, supports reversal and source-change revalidation, and exposes resident-neutral queries.",
+  "behavior_before": "Candidate interpretations were retained as review-required provider results, without assertion-level corroboration, governed application, application history, or revalidation.",
+  "change_id": "PL-0040-CANDIDATE-APPLICATION-20260809",
+  "changed_artifacts": [
+    {
+      "head_git_blob": "HEAD:src/estate/core/estate_comprehension_governance.py",
+      "path": "src/estate/core/estate_comprehension_governance.py",
+      "sha256": "41e011cbac292824c39a8884ebf618186fc7752d4a8d8a489040d862f3dd548a",
+      "state": "UNTRACKED",
+      "worktree_git_blob": "5d91c119607f09cf0127dce7d261f73238a7872f",
+      "worktree_state": "untracked"
+    },
+    {
+      "head_git_blob": "59e7d12e84920ab967f07a4ed57ebc82a675ba9e",
+      "path": "src/estate/core/estate_knowledge_store.py",
+      "sha256": "c12993fc719ae545861dbe69c1f576ebf96b8ba8f60227cfafaac8399b5039cb",
+      "state": "DIRTY",
+      "worktree_git_blob": "91d25a44f1ffb47b9c86566f3e60e4ac3a2f9065",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "cb9160110a04b658481b84459c6cc2e4f857940d",
+      "path": "src/estate/cli/main.py",
+      "sha256": "da6c269230cc649a92871f51a908920379f10c2e5218304be84a4c6c6fb83b99",
+      "state": "DIRTY",
+      "worktree_git_blob": "4dd06e908603b64e123439c6b9627ce7670ea36a",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "HEAD:data/schemas/estate_knowledge_store_v3.schema.json",
+      "path": "data/schemas/estate_knowledge_store_v3.schema.json",
+      "sha256": "7d287ec89a095ede622338bfc86121773b19ee9599ec3ecf26f7a400f302dfe1",
+      "state": "UNTRACKED",
+      "worktree_git_blob": "115a7eddbb0060f6be5308df144f169175ca5aaa",
+      "worktree_state": "untracked"
+    },
+    {
+      "head_git_blob": "b7623a3ae018a16c8f8bd69f0bb58e8c4d9e6f07",
+      "path": "migrations/estate_knowledge_store/README.md",
+      "sha256": "a2e6622559b1264a00d3e44f7032dfb727341a2ba456052f9b5582bf22fbb9a5",
+      "state": "DIRTY",
+      "worktree_git_blob": "ecb040f74a417f206b8e10a421f86147e4f6ea16",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "HEAD:tests/test_estate_comprehension_governance.py",
+      "path": "tests/test_estate_comprehension_governance.py",
+      "sha256": "c68503c2419f8ac4686dd235558d2a86538e982edffd9d500f1baa1de8a21a55",
+      "state": "UNTRACKED",
+      "worktree_git_blob": "1a3b4ce99d4f31285808dd4aa3b1f720b85a912f",
+      "worktree_state": "untracked"
+    },
+    {
+      "head_git_blob": "2345f2f2fbb8766c3bb5bb7975ed800749bd4927",
+      "path": "tests/test_estate_knowledge_store.py",
+      "sha256": "de414e18042aa6179411ace66289fc7574b86ac555303f536bf18438639f83eb",
+      "state": "DIRTY",
+      "worktree_git_blob": "e98581edce9cce142b72431ee7654431ff1d273e",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "b1a75b12d2a9301a4e8cd793dd972f06b3c0ae4a",
+      "path": "docs/operations/troubleshooting/README.md",
+      "sha256": "0a1edf592a13fe3c8462b5ae517b7bf0b5c69e38ce1c467f6ebbf6f263064a29",
+      "state": "DIRTY",
+      "worktree_git_blob": "ffdf4d22c47eae1bd6ce11b6ce3094f01a174665",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "249c0b5a2555e74117d87bdc100418a082ee3537",
+      "path": "collaboration/parking_lot/PL-0040-estate-cookbook-troubleshooting.md",
+      "sha256": "b807e7c4d2aec32e68d3e076fead2ed5b738e44e09bb12db1d1e330a2ca10dfe",
+      "state": "DIRTY",
+      "worktree_git_blob": "79992bbaba9c38e47a5c94bda75277c42408d2d1",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "ddfd265cb0a6b5507b4e28bab945e8c94414757f",
+      "path": "operations/boards/parking_lot_items/PL-0040_ESTATE_COOKBOOK_TROUBLESHOOTING.md",
+      "sha256": "ea80339e26d32e56729bfece51b8bc0a59e9a4b801a640468f8313191b405227",
+      "state": "DIRTY",
+      "worktree_git_blob": "8a674c58920dd5149d7dbe155a4fdb36a6bb7fba",
+      "worktree_state": "dirty"
+    }
+  ],
+  "changed_components": [
+    "estate_knowledge_index",
+    "estate_population",
+    "estate_comprehension_worker",
+    "estate_diagnostics_cli",
+    "living_diagnostics"
+  ],
+  "changed_failure_modes": [
+    "candidate generation and schema-valid provider output no longer imply comprehension coverage"
+  ],
+  "changed_files": [
+    "src/estate/core/estate_comprehension_governance.py",
+    "src/estate/core/estate_knowledge_store.py",
+    "src/estate/cli/main.py",
+    "data/schemas/estate_knowledge_store_v3.schema.json",
+    "migrations/estate_knowledge_store/README.md",
+    "tests/test_estate_comprehension_governance.py",
+    "tests/test_estate_knowledge_store.py",
+    "docs/operations/troubleshooting/README.md",
+    "collaboration/parking_lot/PL-0040-estate-cookbook-troubleshooting.md",
+    "operations/boards/parking_lot_items/PL-0040_ESTATE_COOKBOOK_TROUBLESHOOTING.md"
+  ],
+  "changed_schemas": [
+    "data/schemas/estate_knowledge_store_v3.schema.json"
+  ],
+  "confidence": "CANDIDATE",
+  "dependencies_called": [
+    "SQLite",
+    "Estate knowledge-index CLI",
+    "Diagnostic Impact tooling",
+    "Git"
+  ],
+  "dependencies_read": [
+    "Estate Knowledge Index",
+    "SQLite store and migrations",
+    "governed population pipeline",
+    "local-AI comprehension worker",
+    "PL-0040 benchmark and routing evidence"
+  ],
+  "estate_change_id": "PL-0040-GOVERNED-CANDIDATE-APPLICATION",
+  "expected_inputs": [
+    "candidate interpretations",
+    "current asset identity and source hashes",
+    "deterministic tags and ownership metadata",
+    "governed reviewer decision"
+  ],
+  "expected_outputs": [
+    "assertion records",
+    "corroboration states",
+    "review decisions",
+    "application projection and history",
+    "coverage state"
+  ],
+  "implementation_revision": "0ced9e704e1d2222336856a6f3334f410cd76551",
+  "new_failure_modes": [
+    "provider identity cannot review or apply its own output",
+    "conflicting applications are blocked",
+    "source changes require targeted revalidation",
+    "unsupported assertions remain review exceptions"
+  ],
+  "packet_version": "1.0.0",
+  "prohibited_recovery_actions": [
+    "canonical Cookbook mutation",
+    "recurring scheduler activation",
+    "Level-2, Level-3, or Level-4 processing",
+    "provider self-approval",
+    "source deletion, archival, or deprecation"
+  ],
+  "recommended_checkpoint_impacts": [
+    "LD-RECONCILIATION",
+    "LD-DEVELOPER-INGESTION"
+  ],
+  "resources_written": [
+    "runtime/search/estate_knowledge_index.sqlite3 governed application tables"
+  ],
+  "source_revision": "0ced9e704e1d2222336856a6f3334f410cd76551",
+  "tests_added_or_changed": [
+    "tests/test_estate_comprehension_governance.py",
+    "tests/test_estate_knowledge_store.py"
+  ],
+  "validation_evidence": [
+    "focused governance/store/population/worker tests passed",
+    "three actual Level-1 benchmark schema candidates reviewed",
+    "five assertions routed to REQUEST_MORE_CONTEXT and zero applied",
+    "canonical Cookbook and source files were not mutated"
+  ],
+  "work_package_id": "PL-0040-LIVING-FOUNDATION"
+}

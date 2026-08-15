@@ -1,0 +1,211 @@
+{
+  "activation_restart_impact": "No daemon or scheduler changes. Existing SQLite stores migrate to v5 on open.",
+  "author_provenance": {
+    "actor": "Pat / Steward-authorized Codex",
+    "kind": "HUMAN"
+  },
+  "behavior_after": "The existing owner stores revision-grounded evidence facts, extracts schema/Python/test/source/documentation/ownership/component/tag evidence from admitted inventory, links facts to assertions, derives explicit corroboration states, and exposes evidence queries without changing application policy or canonical truth.",
+  "behavior_before": "Corroboration mostly compared candidate owner, purpose, or tag values with already-indexed values and had no reusable assertion-linked deterministic evidence fact store.",
+  "change_id": "PL-0040-DETERMINISTIC-CORROBORATION-20260809",
+  "changed_artifacts": [
+    {
+      "head_git_blob": "HEAD:src/estate/core/estate_deterministic_evidence.py",
+      "path": "src/estate/core/estate_deterministic_evidence.py",
+      "sha256": "f821ac96b42c28e39083de9a3f4f4eee2635f60e67ca310a509d1dddca88ddf7",
+      "state": "UNTRACKED",
+      "worktree_git_blob": "50c4482a98d2ae5ac63e06539046125b53cdbf9d",
+      "worktree_state": "untracked"
+    },
+    {
+      "head_git_blob": "5d91c119607f09cf0127dce7d261f73238a7872f",
+      "path": "src/estate/core/estate_comprehension_governance.py",
+      "sha256": "059d8e4359c7a1e533e153f01ff31ef39db6e0054829f1aa7c1ff0a535b58006",
+      "state": "DIRTY",
+      "worktree_git_blob": "73a0abee1ecfffee289b6a44413cf128c373dde2",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "91d25a44f1ffb47b9c86566f3e60e4ac3a2f9065",
+      "path": "src/estate/core/estate_knowledge_store.py",
+      "sha256": "35cf34fd95b5da33f91e1fbf6c5ca8f730f0923332b51d7097ca34aa95eaf84c",
+      "state": "DIRTY",
+      "worktree_git_blob": "947296d58123e2d65100a707abea525a79b91579",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "4dd06e908603b64e123439c6b9627ce7670ea36a",
+      "path": "src/estate/cli/main.py",
+      "sha256": "904a75c051105ba6a88306c7ce1c85871367659c8f77a723053965b875b327e6",
+      "state": "DIRTY",
+      "worktree_git_blob": "69c9b7fd04f516bba8c6ae684effdff4d05002ad",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "HEAD:data/schemas/estate_knowledge_store_v4.schema.json",
+      "path": "data/schemas/estate_knowledge_store_v4.schema.json",
+      "sha256": "c4d5e68cf0c6ed7f56781bb2cf824b965d13a1ccf412f24deb9b4aa18b6f1767",
+      "state": "UNTRACKED",
+      "worktree_git_blob": "478116582651ce9e36ebd22a6f2634ca6c1cc8fc",
+      "worktree_state": "untracked"
+    },
+    {
+      "head_git_blob": "HEAD:data/schemas/estate_knowledge_store_v5.schema.json",
+      "path": "data/schemas/estate_knowledge_store_v5.schema.json",
+      "sha256": "3c6331aa8bce371c96b4463a6a080b84e59a5a2951c9454e8591cbde85b2fcdf",
+      "state": "UNTRACKED",
+      "worktree_git_blob": "312550cc9567966ebc1effa4e51e8f95cad8b904",
+      "worktree_state": "untracked"
+    },
+    {
+      "head_git_blob": "ecb040f74a417f206b8e10a421f86147e4f6ea16",
+      "path": "migrations/estate_knowledge_store/README.md",
+      "sha256": "00bdd459ea8506c0110c4e65b0ea559d97045b1ad3c4653b5df414b50c630452",
+      "state": "DIRTY",
+      "worktree_git_blob": "8fd0ca0ea752a6e87bce8bd9ef215611ea15b92e",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "HEAD:tests/test_estate_deterministic_evidence.py",
+      "path": "tests/test_estate_deterministic_evidence.py",
+      "sha256": "d397bb64db410bfb1577bbfb187d4bc74fb485eec9c94047095c7c8c60421cb1",
+      "state": "UNTRACKED",
+      "worktree_git_blob": "afc3ed7c0283eba2ce671dadfbb47a78264cd941",
+      "worktree_state": "untracked"
+    },
+    {
+      "head_git_blob": "e98581edce9cce142b72431ee7654431ff1d273e",
+      "path": "tests/test_estate_knowledge_store.py",
+      "sha256": "9c35c27edf3c08168dde9ba6ff35242dbf53760bf7079fa9626507f77bb94b84",
+      "state": "DIRTY",
+      "worktree_git_blob": "c7f185d717cb49c8fe0f692bfab482834a8e6d5e",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "7711b0474cc7287d941c64a5447b6ccba9f97cc2",
+      "path": "tests/test_estate_comprehension_governance.py",
+      "sha256": "145529c9ef5c40082ffafd35162be41496e5cfb55bebcc889883b31465a6d4c6",
+      "state": "DIRTY",
+      "worktree_git_blob": "a89a4442248e116ddf62a4064e831f708b863cfe",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "ffdf4d22c47eae1bd6ce11b6ce3094f01a174665",
+      "path": "docs/operations/troubleshooting/README.md",
+      "sha256": "7d5c182a9da594a5704b73a672c65131ac05586ee3fd72ac92d6f1dc380bafea",
+      "state": "DIRTY",
+      "worktree_git_blob": "977fd26f516e8c1147a89a2ce1c6db8a3def45de",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "79992bbaba9c38e47a5c94bda75277c42408d2d1",
+      "path": "collaboration/parking_lot/PL-0040-estate-cookbook-troubleshooting.md",
+      "sha256": "800cad43b1b08c595090eeeb0a3a2892eae022dae6ec3b20f41af8eab9e0d3a3",
+      "state": "DIRTY",
+      "worktree_git_blob": "4380bb87094d078178dcd9afba8d665bb89d71ae",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "8a674c58920dd5149d7dbe155a4fdb36a6bb7fba",
+      "path": "operations/boards/parking_lot_items/PL-0040_ESTATE_COOKBOOK_TROUBLESHOOTING.md",
+      "sha256": "9b1bba21c5d1b0c27e67b1570be6df014daba2e9c78386af4a3f95d10ba4e110",
+      "state": "DIRTY",
+      "worktree_git_blob": "37befb5fd5b517008791487e3d4dd30122c3231c",
+      "worktree_state": "dirty"
+    }
+  ],
+  "changed_components": [
+    "estate_knowledge_index",
+    "estate_population",
+    "estate_comprehension_worker",
+    "living_diagnostics"
+  ],
+  "changed_failure_modes": [
+    "corroboration now explains linked evidence instead of relying on indexed-value equality"
+  ],
+  "changed_files": [
+    "src/estate/core/estate_deterministic_evidence.py",
+    "src/estate/core/estate_comprehension_governance.py",
+    "src/estate/core/estate_knowledge_store.py",
+    "src/estate/cli/main.py",
+    "data/schemas/estate_knowledge_store_v4.schema.json",
+    "data/schemas/estate_knowledge_store_v5.schema.json",
+    "migrations/estate_knowledge_store/README.md",
+    "tests/test_estate_deterministic_evidence.py",
+    "tests/test_estate_knowledge_store.py",
+    "tests/test_estate_comprehension_governance.py",
+    "docs/operations/troubleshooting/README.md",
+    "collaboration/parking_lot/PL-0040-estate-cookbook-troubleshooting.md",
+    "operations/boards/parking_lot_items/PL-0040_ESTATE_COOKBOOK_TROUBLESHOOTING.md"
+  ],
+  "changed_schemas": [
+    "data/schemas/estate_knowledge_store_v4.schema.json",
+    "data/schemas/estate_knowledge_store_v5.schema.json"
+  ],
+  "confidence": "CANDIDATE",
+  "dependencies_called": [
+    "SQLite migration owner",
+    "admitted inventory",
+    "Git source revision",
+    "knowledge-index CLI"
+  ],
+  "dependencies_read": [
+    "PL-0040",
+    "Living Diagnostics",
+    "Estate Knowledge Index",
+    "SQLite v3 governance/application layer",
+    "population pipeline",
+    "local-AI worker",
+    "benchmark evidence",
+    "existing impact packets"
+  ],
+  "estate_change_id": "PL-0040-DETERMINISTIC-CORROBORATION-EXPANSION",
+  "expected_inputs": [
+    "admitted inventory assets",
+    "current source files and hashes",
+    "candidate assertions",
+    "existing deterministic component/ownership/index records"
+  ],
+  "expected_outputs": [
+    "evidence facts",
+    "assertion-evidence links",
+    "fact-backed corroboration state and reason",
+    "evidence query results"
+  ],
+  "implementation_revision": "43e0085e181f335e45634aaed9a55ab7b8f24a3e",
+  "new_failure_modes": [
+    "stale evidence cannot support current assertions",
+    "provider-derived facts are excluded",
+    "static relationships may be incomplete",
+    "semantic claims remain unverifiable without sufficient independent evidence"
+  ],
+  "packet_version": "1.0.0",
+  "prohibited_recovery_actions": [
+    "provider self-approval",
+    "canonical promotion",
+    "scheduler activation",
+    "filesystem scope expansion",
+    "source mutation, deletion, archival, or deprecation"
+  ],
+  "recommended_checkpoint_impacts": [
+    "LD-RECONCILIATION",
+    "LD-DEVELOPER-INGESTION"
+  ],
+  "resources_written": [
+    "runtime/search/estate_knowledge_index.sqlite3 v5 evidence tables"
+  ],
+  "source_revision": "43e0085e181f335e45634aaed9a55ab7b8f24a3e",
+  "tests_added_or_changed": [
+    "tests/test_estate_deterministic_evidence.py",
+    "tests/test_estate_comprehension_governance.py",
+    "tests/test_estate_knowledge_store.py"
+  ],
+  "validation_evidence": [
+    "five real Level-1 assertions rerun unchanged and remained NOT_DETERMINISTICALLY_VERIFIABLE",
+    "21 facts and six repository relationships found for the three real schema assets",
+    "12,987 current reusable evidence facts persisted after bounded extraction",
+    "74 focused and relevant evidence/governance/store/worker/index/diagnostic tests passed",
+    "fresh/upgrade/future-version migration tests passed",
+    "no canonical Cookbook or source files mutated"
+  ],
+  "work_package_id": "PL-0040-LIVING-FOUNDATION"
+}

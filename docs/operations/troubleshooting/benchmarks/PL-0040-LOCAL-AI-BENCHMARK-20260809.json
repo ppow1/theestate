@@ -1,0 +1,19 @@
+{
+  "benchmark_id": "PL-0040-LOCAL-AI-BENCHMARK-20260809",
+  "source_revision": "d123146be38fb0b6905ee7ff8d37e7a7763451f4",
+  "provider": "ollama",
+  "model": "qwen3-coder:30b-qwencode-20k",
+  "models_available": ["qwen3-coder:30b-qwencode-20k", "qwen3-coder:30b", "devstral-small-2:latest", "qwen3-vl:8b-instruct", "llama3.1:8b", "qwen3:8b", "llama3:8b", "qwen2.5-coder:7b", "llama3.2:3b"],
+  "levels": {
+    "LEVEL_1": {"attempted": 2, "accepted": 2, "invalid": 0, "retryable": 0, "routing": "ROUTINE_LOCAL_AI"},
+    "LEVEL_2": {"attempted": 2, "accepted": 1, "invalid": 1, "retryable": 0, "routing": "LOCAL_AI_WITH_REVIEW"},
+    "LEVEL_3": {"attempted": 1, "accepted": 1, "invalid": 0, "retryable": 0, "routing": "LOCAL_AI_WITH_REVIEW"},
+    "LEVEL_4": {"attempted": 2, "accepted": 2, "invalid": 0, "retryable": 0, "routing": "ESCALATE_TO_STRONGER_REASONING"}
+  },
+  "benchmark_assets": ["schemas/troubleshooting/comprehension_result_v1.schema.json", "schemas/troubleshooting/population_scope_v1.schema.json", "src/estate/core/estate_population.py", "src/estate/core/estate_comprehension_worker.py", "src/estate/diagnostics/comprehension.py", "collaboration/parking_lot/PL-0040-estate-cookbook-troubleshooting.md", "collaboration/parking_lot/PL-0032-estate-engineering-provider-qualification-suite.md"],
+  "quality": {"invented_asset_or_path": 0, "invalid_evidence_reference": 0, "unsupported_assertions": 0, "uncertainty_preserved": true, "human_review_required": true},
+  "observed_failures": [{"kind": "STALE_PACKET", "count": 3, "outcome": "failed closed"}, {"kind": "PLACEHOLDER_RESULT_ID_CONFLICT", "count": 1, "outcome": "preserved then repaired with Estate-owned ID"}, {"kind": "LOCAL_PROVIDER_TIMEOUT", "count": 1, "model": "qwen3:8b", "seconds": 120, "outcome": "retryable"}],
+  "backlog_burn_down": {"class": "LEVEL_1", "scope": "schemas", "attempted": 3, "accepted": 3, "canonical_promotions": 0, "pending_before": 3909, "pending_after": 3909, "candidate_interpretations_before": 18, "candidate_interpretations_after": 21},
+  "throughput": {"benchmark_attempted_model_calls": 7, "benchmark_accepted_units": 6, "burn_down_accepted_units": 3, "burn_down_average_inference_seconds": 2.18, "estimated_units_per_hour_excluding_review": 1650},
+  "limitations": ["Only qwen3-coder:30b was benchmarked across all four levels.", "Level 3 sample size was one.", "Candidate acceptance does not reduce canonical comprehension counts without governed review/application."]
+}

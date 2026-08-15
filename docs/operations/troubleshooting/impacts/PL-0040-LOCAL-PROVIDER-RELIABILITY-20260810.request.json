@@ -1,0 +1,41 @@
+{
+  "packet_version": "1.0.0",
+  "change_id": "PL-0040-LOCAL-PROVIDER-RELIABILITY-20260810",
+  "work_package_id": "PL-0040-LIVING-FOUNDATION",
+  "estate_change_id": "PL-0040-LOCAL-PROVIDER-RELIABILITY-AND-EVIDENCE-SCALE-HARDENING",
+  "author_provenance": {"kind": "HUMAN", "actor": "Pat / Steward-authorized Codex"},
+  "changed_files": [
+    "src/estate/core/resident_interaction.py",
+    "src/estate/core/estate_comprehension_worker.py",
+    "src/estate/core/estate_deterministic_evidence.py",
+    "tests/test_estate_deterministic_evidence.py",
+    "collaboration/parking_lot/PL-0040-estate-cookbook-troubleshooting.md",
+    "docs/operations/troubleshooting/impacts/PL-0040-LOCAL-PROVIDER-RELIABILITY-20260810.request.json"
+  ],
+  "changed_components": ["local_ollama_provider_boundary", "estate_comprehension_worker", "estate_deterministic_evidence", "estate_knowledge_index", "living_diagnostics"],
+  "changed_schemas": [],
+  "behavior_before": "Provider generation exposed only coarse success/failure metadata, a provider failure did not stop the current bounded loop, and evidence extraction attempted broad source-fact work for every selected asset without reporting new versus reused facts.",
+  "behavior_after": "Provider attempts expose bounded phase timing and response metadata, provider failure stops the current invocation, and evidence facts reuse unchanged hash-grounded logical facts with explicit new/reused counts. The exact timed-out schema was retried safely, but a later registry/config checkpoint stopped on two invalid evidence citations.",
+  "expected_inputs": ["existing governed work batches", "admitted assets", "bounded evidence packets", "local Ollama endpoint", "existing v5 SQLite store"],
+  "expected_outputs": ["phase-aware provider telemetry", "preserved retry failure and recovery attempt", "incremental evidence metrics", "checkpoint quality and stop evidence"],
+  "dependencies_read": ["PL-0040", "controlled Level-1 scale packet", "Estate Knowledge Index v5", "evidence-enriched worker", "deterministic evidence engine", "existing retry and review/application owners"],
+  "dependencies_called": ["SQLite v5 runtime store", "Ollama /api/tags and /api/generate", "knowledge-index CLI"],
+  "resources_written": ["runtime/search/estate_knowledge_index.sqlite3 candidate, evidence, review, application, and retry state"],
+  "new_failure_modes": ["provider outputs can fail closed for missing or out-of-packet evidence citations", "registry/config comprehension remains operationally unsuitable for continuation after citation failures"],
+  "changed_failure_modes": ["provider failure now stops the current bounded invocation instead of dequeuing more work"],
+  "tests_added_or_changed": ["tests/test_estate_deterministic_evidence.py"],
+  "validation_evidence": [
+    "focused evidence, worker, population, and applicable provider-boundary tests passed; four unrelated live resident-interaction environment tests remain failing",
+    "qwen3:8b bounded probes completed in 1.74s cold and 1.27s repeated; qwen3-coder:30b-qwencode-20k completed in 0.44s",
+    "the timed-out capability_reevaluation schema retried in 17.39s with a new batch/result identity",
+    "Checkpoint A completed eight additional engineering schemas with zero invalid results",
+    "Checkpoint B completed seven registry/config candidates but stopped after two invalid citation results; no later class was attempted",
+    "unchanged evidence extraction reported zero new facts on the repeated run; SQLite integrity_check returned ok"
+  ],
+  "recommended_checkpoint_impacts": ["LD-RECONCILIATION", "LD-DEVELOPER-INGESTION"],
+  "prohibited_recovery_actions": ["provider self-approval", "continuing after invalid citation stop", "scheduler activation", "GPU stress/reset/reconfiguration", "source mutation, deletion, archival, or deprecation", "canonical promotion"],
+  "activation_restart_impact": "No service, daemon, scheduler, GPU, driver, or Windows configuration changes.",
+  "source_revision": "a874238f5f00072d245d3e614fe6fa09a80cfe9c",
+  "implementation_revision": "a874238f5f00072d245d3e614fe6fa09a80cfe9c",
+  "confidence": "CANDIDATE"
+}

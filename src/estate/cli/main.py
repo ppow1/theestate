@@ -55,6 +55,29 @@ from estate.core.estate_knowledge_index import (
     query_index as query_knowledge_index,
     rebuild_index as rebuild_knowledge_index,
     status as knowledge_index_status,
+    sqlite_coverage,
+    sqlite_graph,
+    sqlite_init,
+    sqlite_knowledge,
+    sqlite_batch_packet,
+    sqlite_governed_scan,
+    sqlite_next_batch,
+    sqlite_population_coverage,
+    sqlite_result_ingest,
+    sqlite_result_validate,
+    sqlite_scope,
+    sqlite_validate_scope,
+    sqlite_work_retry,
+    sqlite_work_status,
+    sqlite_lifecycle,
+    sqlite_packet,
+    sqlite_progress,
+    sqlite_query,
+    sqlite_rebuild,
+    sqlite_scan,
+    sqlite_stale,
+    sqlite_status,
+    sqlite_unknown,
 )
 from estate.core.global_search_command_palette import search_global_palette, execute_registered_command, format_palette_report
 from estate.core.document_registry import load_document_registry, format_document_registry
@@ -118,6 +141,24 @@ from estate.core.helen_duty import run_helen_duty, format_helen_duty
 from estate.core.helen_readiness import build_readiness
 from estate.core.resident_authority import check_authority, list_authority, format_authority_decision
 from estate.core.resident_interaction import process_chat, load_history, forget_conversation, resident_surface, alfred_llm_diagnostic
+from estate.core.estate_comprehension_worker import provider_status as comprehension_provider_status, run_local as run_local_comprehension, review_queue as comprehension_review_queue
+from estate.core.estate_comprehension_governance import (
+    application_history as comprehension_application_history,
+    apply_eligible as comprehension_apply_eligible,
+    corroborate as comprehension_corroborate,
+    decide as comprehension_decide,
+    eligible as comprehension_application_eligible,
+    extract_assertions as comprehension_extract_assertions,
+    governance_coverage as comprehension_governance_coverage,
+    resident_query as comprehension_resident_query,
+    review_asset as comprehension_review_asset,
+    review_batch as comprehension_review_batch,
+    review_summary as comprehension_review_summary,
+    reverse_application as comprehension_reverse_application,
+    revalidate_applications as comprehension_revalidate_applications,
+)
+from estate.core.estate_deterministic_evidence import corroboration_exceptions as deterministic_corroboration_exceptions, evidence_assertion as deterministic_evidence_assertion, evidence_asset as deterministic_evidence_asset, extract_evidence as deterministic_extract_evidence
+from estate.core.estate_comprehension_routing import routing_status as comprehension_routing_status
 from estate.core.resident_gateway import serve as serve_resident_gateway, gateway_status
 from estate.core.paths import ESTATE_ROOT, LEDGER_PATH, DEVLOG_PATH
 from estate.core.planning_provider import PlanningProviderRequest
@@ -1910,6 +1951,101 @@ def cmd_estate_search(args):
 def cmd_knowledge_index(args):
     root = Path(args.root) if getattr(args, "root", None) else Path.cwd()
     action = args.knowledge_index_action
+    if getattr(args, "backend", "legacy") == "sqlite":
+        if action == "scope-show":
+            payload = sqlite_scope(root)
+        elif action == "scope-validate":
+            payload = sqlite_validate_scope(root, requested=args.requested_scope)
+        elif action == "scope-review":
+            payload = sqlite_scope(root, output=args.output)
+        elif action == "init" or action == "migrate":
+            payload = sqlite_init(root)
+        elif action == "rebuild":
+            payload = sqlite_rebuild(root, scope=args.scope, limit=args.limit)
+        elif action == "scan" or action == "resume":
+            payload = sqlite_governed_scan(root, requested=args.scope, limit=getattr(args, "limit", None))
+        elif action == "status":
+            payload = sqlite_status(root)
+        elif action == "coverage":
+            payload = sqlite_population_coverage(root)
+        elif action == "progress":
+            payload = sqlite_progress(root)
+        elif action == "unknown":
+            payload = sqlite_unknown(root, limit=args.limit)
+        elif action == "stale":
+            payload = sqlite_stale(root)
+        elif action == "graph":
+            payload = sqlite_graph(root, scope=args.scope)
+        elif action == "packet":
+            payload = sqlite_packet(root, args.scope)
+        elif action == "batch-packet":
+            payload = sqlite_batch_packet(root, args.batch_id, max_bytes=args.max_bytes, evidence_limit=args.evidence_limit, evidence_bytes=args.evidence_bytes)
+        elif action == "next-batch":
+            payload = sqlite_next_batch(root, limit=args.limit, provider_type=args.provider_type, provider_model=args.provider_model, worker_identity=args.worker_identity, asset_prefix=args.asset_prefix)
+        elif action == "work-status":
+            payload = sqlite_work_status(root)
+        elif action == "work-retry":
+            payload = sqlite_work_retry(root, args.batch_id)
+        elif action == "provider-status":
+            payload = comprehension_provider_status(timeout=getattr(args, "timeout", 4.0), model=getattr(args, "model", None))
+        elif action == "routing-status":
+            payload = comprehension_routing_status(root)
+        elif action == "work-run":
+            payload = run_local_comprehension(root, limit=args.limit, max_bytes=args.max_bytes, model=args.model, worker_identity=args.worker_identity, asset_prefix=args.asset_prefix, timeout=args.timeout, allow_reprocess=args.reprocess)
+        elif action == "work-review":
+            payload = comprehension_review_queue(root)
+        elif action == "review-extract":
+            payload = comprehension_extract_assertions(root, interpretation_id=getattr(args, "interpretation_id", None))
+        elif action == "evidence-extract":
+            payload = deterministic_extract_evidence(root, asset_ids=args.asset_id)
+        elif action == "evidence-asset":
+            payload = deterministic_evidence_asset(root, args.asset_id)
+        elif action == "evidence-assertion":
+            payload = deterministic_evidence_assertion(root, args.assertion_id)
+        elif action == "corroborate":
+            payload = comprehension_corroborate(root, assertion_ids=args.assertion_id, asset_id=getattr(args, "asset_id", None))
+        elif action == "corroboration-exceptions":
+            payload = deterministic_corroboration_exceptions(root)
+        elif action == "review-summary":
+            payload = comprehension_review_summary(root, asset_id=getattr(args, "asset_id", None))
+        elif action == "review-batch":
+            payload = comprehension_corroborate(root, asset_id=getattr(args, "asset_id", None))
+            payload = {"corroboration": payload, "review": comprehension_review_batch(root, reviewer_id=args.reviewer_id, reviewer_type=args.reviewer_type, asset_prefix=args.asset_prefix)}
+        elif action == "review-asset":
+            payload = comprehension_review_asset(root, args.asset_id, reviewer_id=args.reviewer_id, reviewer_type=args.reviewer_type)
+        elif action == "review-exceptions":
+            payload = comprehension_review_summary(root)
+            payload["exceptions"] = [row for row in payload.get("exceptions", [])]
+        elif action in {"review-approve", "review-reject", "review-defer", "review-escalate"}:
+            decisions = {"review-approve":"APPROVE_FOR_INDEX_APPLICATION", "review-reject":args.decision, "review-defer":"DEFER", "review-escalate":args.decision}
+            payload = comprehension_decide(root, args.assertion_id, decision=decisions[action], reviewer_id=args.reviewer_id, reviewer_type=args.reviewer_type, rationale=args.rationale, evidence_refs=args.evidence_ref)
+        elif action == "application-eligible":
+            payload = comprehension_application_eligible(root)
+        elif action == "application-apply":
+            payload = comprehension_apply_eligible(root, assertion_ids=args.assertion_id, actor_id=args.actor_id, actor_type=args.actor_type)
+        elif action == "application-history":
+            payload = comprehension_application_history(root, asset_id=getattr(args, "asset_id", None))
+        elif action == "application-reverse":
+            payload = comprehension_reverse_application(root, args.application_id, actor_id=args.actor_id, actor_type=args.actor_type, reason=args.reason)
+        elif action == "application-revalidate":
+            payload = comprehension_revalidate_applications(root)
+        elif action == "application-coverage":
+            payload = comprehension_governance_coverage(root)
+        elif action == "resident-query":
+            payload = comprehension_resident_query(root, role=args.role, query=args.query or "")
+        elif action in {"result-validate", "result-ingest"}:
+            request = json.loads(Path(args.input).read_text(encoding="utf-8"))
+            payload = sqlite_result_validate(root, request) if action == "result-validate" else sqlite_result_ingest(root, request)
+        elif action == "lifecycle":
+            payload = sqlite_lifecycle(root)
+        elif action == "knowledge":
+            payload = sqlite_knowledge(root, phrase=args.query or "", limit=args.limit)
+        elif action == "query":
+            payload = sqlite_query(args.query or "", root=root, owner=args.owner, tag=args.tag, status_filter=args.asset_status, limit=args.limit)
+        else:
+            raise SystemExit(1)
+        print(json.dumps(payload, indent=2, sort_keys=True))
+        return
     if action == "rebuild":
         payload = rebuild_knowledge_index(root, write=True)
     elif action == "update":
@@ -3736,15 +3872,118 @@ def main(argv=None):
     p = sub.add_parser("knowledge-index", help="Build, inspect, and query the governed Estate knowledge index")
     p.add_argument("--root", help="Estate root path; defaults to the current working directory")
     p.add_argument("--json", action="store_true", help="Print JSON output")
+    p.add_argument("--backend", choices=["legacy", "sqlite"], default="legacy", help="Index projection to use; SQLite is the relational institutional index")
     sp = p.add_subparsers(dest="knowledge_index_action", required=True)
-    sp.add_parser("rebuild", help="Rebuild the knowledge index from local artifacts").set_defaults(func=cmd_knowledge_index)
     sp.add_parser("update", help="Incrementally refresh changed index entries").set_defaults(func=cmd_knowledge_index)
     sp.add_parser("status", help="Print index status").set_defaults(func=cmd_knowledge_index)
     sp.add_parser("inspect", help="Detect stale or missing index entries").set_defaults(func=cmd_knowledge_index)
+    for name, help_text in (("scope-show", "Show the governed population scope"), ("scope-validate", "Validate a requested scope against the governed contract"), ("scope-review", "Report adjacent boundaries without traversing them"), ("init", "Initialize or migrate the SQLite institutional index"), ("migrate", "Apply ordered SQLite migrations"), ("status", "Print index status"), ("coverage", "Print indexed comprehension coverage"), ("progress", "Print scan progress"), ("unknown", "List unknown or partially understood assets"), ("stale", "List assets requiring revalidation"), ("lifecycle", "List lifecycle assessments without mutating files"), ("knowledge", "Query indexed operational knowledge identities"), ("next-batch", "Create the next bounded comprehension work batch"), ("work-status", "Show comprehension work batches"), ("work-review", "Show failed and review-required work"), ("review-extract", "Extract assertion-level candidate material"), ("evidence-extract", "Extract revision-grounded deterministic evidence facts"), ("evidence-asset", "Show deterministic evidence facts for an asset"), ("evidence-assertion", "Show evidence linked to an assertion"), ("corroborate", "Corroborate assertions from independent evidence"), ("corroboration-exceptions", "List assertions lacking sufficient deterministic support"), ("review-summary", "Summarize assertion review state"), ("review-batch", "Corroborate and review a bounded assertion batch"), ("review-asset", "Corroborate and review one asset"), ("review-exceptions", "List assertion review exceptions"), ("review-approve", "Approve one corroborated low-risk assertion"), ("review-reject", "Reject one assertion"), ("review-defer", "Defer one assertion"), ("review-escalate", "Escalate one assertion"), ("application-eligible", "List eligible indexed applications"), ("application-apply", "Apply eligible indexed understanding"), ("application-history", "Show application history"), ("application-reverse", "Reverse one indexed application"), ("application-revalidate", "Queue changed applications for revalidation"), ("application-coverage", "Show assertion/application coverage"), ("resident-query", "Query applied understanding through the resident-neutral layer"), ("provider-status", "Check the governed local inference provider"), ("routing-status", "Show model/class route decisions and escalation lineage"), ("work-run", "Run bounded local comprehension work"), ("result-validate", "Validate a provider result without ingesting it"), ("result-ingest", "Ingest a validated provider result as candidate material")):
+        if name == "status":
+            continue
+        child = sp.add_parser(name, help=help_text)
+        if name == "scope-validate":
+            child.add_argument("requested_scope", nargs="?", default=None)
+        elif name == "scope-review":
+            child.add_argument("--output")
+        if name == "knowledge":
+            child.add_argument("query", nargs="?", default="", help="Knowledge title or identifier phrase")
+            child.add_argument("--limit", type=int, default=100)
+        elif name == "batch-packet":
+            child.add_argument("batch_id")
+            child.add_argument("--max-bytes", type=int, default=262144)
+            child.add_argument("--evidence-limit", type=int, default=24)
+            child.add_argument("--evidence-bytes", type=int, default=16384)
+        elif name == "review-extract":
+            child.add_argument("--interpretation-id")
+        elif name == "evidence-extract":
+            child.add_argument("--asset-id", action="append")
+        elif name == "evidence-asset":
+            child.add_argument("asset_id")
+        elif name == "evidence-assertion":
+            child.add_argument("assertion_id")
+        elif name == "corroborate":
+            child.add_argument("--assertion-id", action="append")
+            child.add_argument("--asset-id")
+        elif name in {"review-summary", "review-exceptions", "application-history"}:
+            child.add_argument("--asset-id")
+        elif name == "review-batch":
+            child.add_argument("--asset-prefix")
+            child.add_argument("--reviewer-id", default="estate-level1-deterministic-review")
+            child.add_argument("--reviewer-type", default="deterministic_policy")
+        elif name == "review-asset":
+            child.add_argument("asset_id")
+            child.add_argument("--reviewer-id", default="estate-level1-deterministic-review")
+            child.add_argument("--reviewer-type", default="deterministic_policy")
+        elif name in {"review-approve", "review-reject", "review-defer", "review-escalate"}:
+            child.add_argument("assertion_id")
+            child.add_argument("--reviewer-id", required=True)
+            child.add_argument("--reviewer-type", required=True)
+            child.add_argument("--rationale", required=True)
+            child.add_argument("--evidence-ref", action="append", default=[])
+            if name in {"review-reject", "review-escalate"}:
+                child.add_argument("--decision", required=True, choices=["REJECT_UNSUPPORTED", "REJECT_CONTRADICTED", "ESCALATE_STRONGER_REASONING", "ESCALATE_HUMAN"])
+        elif name == "application-apply":
+            child.add_argument("--assertion-id", action="append")
+            child.add_argument("--actor-id", required=True)
+            child.add_argument("--actor-type", required=True)
+        elif name == "application-reverse":
+            child.add_argument("application_id")
+            child.add_argument("--actor-id", required=True)
+            child.add_argument("--actor-type", required=True)
+            child.add_argument("--reason", required=True)
+        elif name == "resident-query":
+            child.add_argument("query", nargs="?", default="")
+            child.add_argument("--role", default="researcher", choices=["grace", "historian", "researcher"])
+        elif name == "next-batch":
+            child.add_argument("--limit", type=int, default=10)
+            child.add_argument("--asset-prefix")
+            child.add_argument("--provider-type")
+            child.add_argument("--provider-model")
+            child.add_argument("--worker-identity")
+        elif name == "provider-status":
+            child.add_argument("--model")
+            child.add_argument("--timeout", type=float, default=4.0)
+        elif name == "work-run":
+            child.add_argument("--limit", type=int, default=1)
+            child.add_argument("--max-bytes", type=int, default=65536)
+            child.add_argument("--model")
+            child.add_argument("--timeout", type=float, default=120.0)
+            child.add_argument("--worker-identity", default="estate-local-comprehension-worker")
+            child.add_argument("--asset-prefix")
+            child.add_argument("--reprocess", action="store_true", help="Explicitly reprocess the bounded current-revision asset for model comparison")
+        elif name in {"result-validate", "result-ingest"}:
+            child.add_argument("--input", required=True)
+        child.set_defaults(func=cmd_knowledge_index)
+    for name, help_text in (("scan", "Incrementally scan a bounded repository scope"), ("resume", "Resume a bounded deterministic scan"), ("rebuild", "Rebuild the SQLite projection from governed files")):
+        if name == "rebuild":
+            continue
+        child = sp.add_parser(name, help=help_text)
+        child.add_argument("--scope", help="Repository-relative file or directory scope")
+        child.add_argument("--limit", type=int, default=None, help="Maximum files to process")
+        child.set_defaults(func=cmd_knowledge_index)
+    rb = sp.add_parser("rebuild", help="Rebuild the SQLite projection from governed files")
+    rb.add_argument("--scope", help="Repository-relative file or directory scope")
+    rb.add_argument("--limit", type=int, default=None, help="Maximum files to process")
+    rb.set_defaults(func=cmd_knowledge_index)
+    bp = sp.add_parser("batch-packet", help="Build a bounded provider-neutral packet for a work batch")
+    bp.add_argument("batch_id")
+    bp.add_argument("--max-bytes", type=int, default=262144)
+    bp.add_argument("--evidence-limit", type=int, default=24)
+    bp.add_argument("--evidence-bytes", type=int, default=16384)
+    bp.set_defaults(func=cmd_knowledge_index)
+    wr = sp.add_parser("work-retry", help="Mark a comprehension batch retryable")
+    wr.add_argument("batch_id")
+    wr.set_defaults(func=cmd_knowledge_index)
+    for name, help_text in (("graph", "Build a bounded component graph"), ("packet", "Build a provider-neutral indexed comprehension packet")):
+        child = sp.add_parser(name, help=help_text)
+        child.add_argument("scope", help="Component or workflow identifier")
+        child.set_defaults(func=cmd_knowledge_index)
     q = sp.add_parser("query", help="Query indexed Estate artifacts")
     q.add_argument("query", nargs="?", default="", help="Keyword query")
     q.add_argument("--artifact-type", help="Filter by normalized artifact type")
     q.add_argument("--owner", help="Filter by owner")
+    q.add_argument("--tag", help="Filter by deterministic or candidate tag (SQLite backend)")
+    q.add_argument("--asset-status", dest="asset_status", help="Filter by indexed asset status (SQLite backend)")
     q.add_argument("--classification", help="Filter by classification")
     q.add_argument("--include-private", action="store_true", help="Include protected private records")
     q.add_argument("--limit", type=int, default=20, help="Maximum results")

@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate://schemas/troubleshooting/operational_knowledge_v1",
+  "title": "Estate Operational Troubleshooting Knowledge v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "knowledge_id", "title", "lifecycle", "records", "source"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "knowledge_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,199}$"},
+    "title": {"type": "string", "minLength": 1},
+    "lifecycle": {"enum": ["RAW_EVIDENCE", "OBSERVATION", "HYPOTHESIS", "CANDIDATE", "VERIFIED", "CANONICAL"]},
+    "records": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/record"}},
+    "source": {"$ref": "#/$defs/provenance"},
+    "promotion": {"$ref": "#/$defs/promotion"}
+  },
+  "$defs": {
+    "provenance": {"type": "object", "additionalProperties": false, "required": ["kind", "actor", "evidence_refs"], "properties": {"kind": {"enum": ["DETERMINISTIC", "LOCAL_AI", "EXTERNAL_AI", "HUMAN", "MIXED"]}, "actor": {"type": "string", "minLength": 1}, "evidence_refs": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}}},
+    "record": {"type": "object", "additionalProperties": false, "required": ["record_id", "kind", "statement", "evidence_refs", "confidence", "verification_state"], "properties": {"record_id": {"type": "string", "minLength": 1}, "kind": {"enum": ["symptom", "observation", "measurement", "state_transition", "known_good_baseline", "hypothesis", "supporting_evidence", "contradictory_evidence", "disproven_hypothesis", "verified_diagnosis", "unresolved_diagnosis", "diagnostic_probe", "recovery_attempt", "recovery_verification", "explicit_non_action", "risky_action", "stop_condition", "escalation_condition", "evidence_reference"]}, "statement": {"type": "string", "minLength": 1}, "evidence_refs": {"type": "array", "items": {"type": "string"}}, "confidence": {"enum": ["UNKNOWN", "LOW", "MEDIUM", "HIGH"]}, "verification_state": {"enum": ["UNVERIFIED", "SUPPORTED", "CONTRADICTED", "DISPROVEN", "VERIFIED"]}, "action_outcome": {"enum": ["NOT_APPLICABLE", "FAILED", "SUCCEEDED", "NOT_PERFORMED"]}, "verification_evidence": {"type": "array", "items": {"type": "string"}}, "related_record_ids": {"type": "array", "items": {"type": "string"}}, "provenance": {"$ref": "#/$defs/provenance"}}},
+    "promotion": {"type": "object", "additionalProperties": false, "required": ["actor", "evidence_refs", "decision"], "properties": {"actor": {"type": "string", "minLength": 1}, "evidence_refs": {"type": "array", "minItems": 1, "items": {"type": "string"}}, "decision": {"enum": ["VALIDATED", "PROMOTED"]}, "reason": {"type": "string"}}}
+  }
+}

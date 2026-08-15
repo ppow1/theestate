@@ -108,7 +108,7 @@ For a material code change, record at minimum:
 - proposed new checkpoint/failure knowledge where an existing entry cannot absorb the change.
 
 Use the canonical, provider-neutral Diagnostic Impact Packet command:
-`python tools/estate_diagnostics.py impact create --input <request.json> --output <packet.json>`.
+`python tools/estate_diagnostics.py impact create --request <request.json> --output <packet.json>`.
 The schema and concise workflow live in `docs/operations/troubleshooting/README.md`.
 Do not silently change implementation and leave Living Diagnostics to reverse-engineer intent later.
 
@@ -301,3 +301,4 @@ When choosing among capable providers or models, do not optimize only for nomina
 ## 18. Final Engineering Principle
 
 Build the smallest correct change inside the existing Estate architecture. Know exactly which revision and environment you changed. Leave evidence that another worker can verify. Teach Living Diagnostics what changed while you still understand it. Test through the boundary that actually matters. Promote deliberately when the Estate's candidate/acceptance path is available, document authorized exceptions when it is not, and preserve enough provenance to recover safely.
+

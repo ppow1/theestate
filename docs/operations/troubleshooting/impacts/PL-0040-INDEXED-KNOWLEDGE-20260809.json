@@ -1,0 +1,163 @@
+{
+  "activation_restart_impact": "No daemon or service restart; CLI creates or migrates the runtime projection. Existing scheduler ownership is unchanged.",
+  "author_provenance": {
+    "actor": "Pat / Steward authorized Codex",
+    "kind": "HUMAN"
+  },
+  "behavior_after": "The same owner provides a rebuildable SQLite projection with transactional migration, bounded deterministic inventory, provenance-bearing relational links, coverage/staleness queries, graph output, and provider-neutral indexed packets; Git and governed artifacts remain authoritative.",
+  "behavior_before": "The existing knowledge-index owner provided a governed JSON retrieval projection but no migration-governed relational inventory or resumable relational scan state.",
+  "change_id": "PL-0040-INDEXED-KNOWLEDGE-20260809",
+  "changed_artifacts": [
+    {
+      "head_git_blob": "HEAD:src/estate/core/estate_knowledge_store.py",
+      "path": "src/estate/core/estate_knowledge_store.py",
+      "sha256": "a54b7a36128a5bdf1bd0fac78728621999c7efcaf77fdabca7b9e3fac408bc2b",
+      "state": "UNTRACKED",
+      "worktree_git_blob": "68944f9fdb8da36436c04c2b609d4cca72274e22",
+      "worktree_state": "untracked"
+    },
+    {
+      "head_git_blob": "b55249cf084d95462db85289c2fde2ade0750eb3",
+      "path": "src/estate/core/estate_knowledge_index.py",
+      "sha256": "452e7516acc3e807eec4ab173f5dfa719a2af1a6bc23de8e151fe794d55fc4c7",
+      "state": "DIRTY",
+      "worktree_git_blob": "49b151c9b7d7d8b55a06218d83ab55a7d61e55e3",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "24825b06f82075846995c51899a9d5c174d73d16",
+      "path": "src/estate/cli/main.py",
+      "sha256": "cd9fc070bf35d48471eb84d848bc2214def7bf78b5cd00b7f3ef3e9c3a6cba1b",
+      "state": "DIRTY",
+      "worktree_git_blob": "5b033ba684996a214f6ba0e4a46b28b62e7929b4",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "HEAD:data/schemas/estate_knowledge_store_v1.schema.json",
+      "path": "data/schemas/estate_knowledge_store_v1.schema.json",
+      "sha256": "a1b0f1ef20d04f9f2d3ee977d89a9d89ec318bd19ded323de378401cc8224d72",
+      "state": "UNTRACKED",
+      "worktree_git_blob": "b8c9e3abdc6566ece83691c89e31e7e8fbc26ee3",
+      "worktree_state": "untracked"
+    },
+    {
+      "head_git_blob": "HEAD:migrations/estate_knowledge_store/README.md",
+      "path": "migrations/estate_knowledge_store/README.md",
+      "sha256": "95142d01876a4936665549759e5bd7bb39c077e5026475c5cb9ec6ec3f8a0a95",
+      "state": "UNTRACKED",
+      "worktree_git_blob": "1121514a669328406bce70e71b6c26d8f3a5391d",
+      "worktree_state": "untracked"
+    },
+    {
+      "head_git_blob": "HEAD:tests/test_estate_knowledge_store.py",
+      "path": "tests/test_estate_knowledge_store.py",
+      "sha256": "c7ae86098728e1ed8551ce0249d1dc0d71db2f0590085ba40d6052d391f50049",
+      "state": "UNTRACKED",
+      "worktree_git_blob": "d99d982b8a64a4a49e9cedbbf3b976b49d4b1791",
+      "worktree_state": "untracked"
+    },
+    {
+      "head_git_blob": "3a0f5a1bcb1e97af462e3734cee5c81dc592df5c",
+      "path": "docs/operations/troubleshooting/README.md",
+      "sha256": "3c74a77a5d55d0885b2431a2feb4113f5aa51fcf192028cba22283a3a66fd529",
+      "state": "DIRTY",
+      "worktree_git_blob": "aa34ed9dc4e2e63b547c95b0ab2e1049991e132e",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "2966021f2b726882603d61a91ed3ff0bc63ede0d",
+      "path": "collaboration/parking_lot/PL-0040-estate-cookbook-troubleshooting.md",
+      "sha256": "838ddaa8080c17309b28fac7e9c570fedc067a3c8d6ff244bbc06acb7927b848",
+      "state": "DIRTY",
+      "worktree_git_blob": "17e3c71f596207e233e03348e53aeea6fc97f23d",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "8853734e18d66a1a8ba2b97a2ecc757c3958c1a7",
+      "path": "operations/boards/parking_lot_items/PL-0040_ESTATE_COOKBOOK_TROUBLESHOOTING.md",
+      "sha256": "370407e6697e7c513221929934e1b735c9e916811e92ab9e47adbd44e23ac630",
+      "state": "DIRTY",
+      "worktree_git_blob": "9cacb0f02d96babe7f6db290a1efe26c72063cc0",
+      "worktree_state": "dirty"
+    }
+  ],
+  "changed_components": [
+    "estate_knowledge_index",
+    "estate_knowledge_store",
+    "estate_diagnostics_cli"
+  ],
+  "changed_failure_modes": [
+    "bounded repository inventory can resume from indexed scan history instead of monolithic JSON state"
+  ],
+  "changed_files": [
+    "src/estate/core/estate_knowledge_store.py",
+    "src/estate/core/estate_knowledge_index.py",
+    "src/estate/cli/main.py",
+    "data/schemas/estate_knowledge_store_v1.schema.json",
+    "migrations/estate_knowledge_store/README.md",
+    "tests/test_estate_knowledge_store.py",
+    "docs/operations/troubleshooting/README.md",
+    "collaboration/parking_lot/PL-0040-estate-cookbook-troubleshooting.md",
+    "operations/boards/parking_lot_items/PL-0040_ESTATE_COOKBOOK_TROUBLESHOOTING.md"
+  ],
+  "changed_schemas": [
+    "data/schemas/estate_knowledge_store_v1.schema.json"
+  ],
+  "confidence": "CANDIDATE",
+  "dependencies_called": [
+    "Python standard library sqlite3",
+    "existing Estate knowledge-index owner",
+    "Git source identity"
+  ],
+  "dependencies_read": [
+    "existing Estate Knowledge Index",
+    "Living Diagnostics comprehension model",
+    "Diagnostic Impact Packet contract",
+    "existing CLI conventions"
+  ],
+  "estate_change_id": "PL-0040-INSTITUTIONAL-INDEX",
+  "expected_inputs": [
+    "bounded repository scope",
+    "current Git revision",
+    "existing comprehension model",
+    "existing registry and governed source artifacts"
+  ],
+  "expected_outputs": [
+    "SQLite inventory projection",
+    "scan history and coverage",
+    "queryable component/workflow context",
+    "bounded provider-neutral packet"
+  ],
+  "implementation_revision": "WORKTREE",
+  "new_failure_modes": [
+    "future incompatible SQLite schema fails closed",
+    "changed comprehended assets require revalidation"
+  ],
+  "packet_version": "1.0.0",
+  "preliminary_troubleshooting_notes": [
+    "Treat SQLite as a rebuildable projection; use Git/governed JSON/evidence as authority. Changed comprehended assets are revalidation candidates, not silently rewritten truth."
+  ],
+  "prohibited_recovery_actions": [
+    "Do not promote provider output from the index",
+    "Do not issue arbitrary resident SQL",
+    "Do not delete governed source files during rebuild",
+    "Do not launch estate-wide AI population"
+  ],
+  "recommended_checkpoint_impacts": [
+    "LD-RECONCILIATION",
+    "LD-DEVELOPER-INGESTION"
+  ],
+  "resources_written": [
+    "runtime/search/estate_knowledge_index.sqlite3"
+  ],
+  "source_revision": "WORKTREE",
+  "tests_added_or_changed": [
+    "tests/test_estate_knowledge_store.py"
+  ],
+  "validation_evidence": [
+    "focused SQLite migration/inventory/rebuild tests",
+    "CLI init, bounded scan, status, coverage, graph, packet, and query acceptance",
+    "existing Living Diagnostics and knowledge-index regression tests"
+  ],
+  "work_package_id": "PL-0040-LIVING-FOUNDATION"
+}

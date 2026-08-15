@@ -1,0 +1,193 @@
+{
+  "activation_restart_impact": "No daemon, scheduler, driver, CUDA, GPU, or Windows configuration changes.",
+  "author_provenance": {
+    "actor": "Pat / Steward-authorized Codex",
+    "kind": "HUMAN"
+  },
+  "behavior_after": "Versioned evidence-enriched packets include bounded current evidence facts and stable fact IDs. The worker requires positive claims to cite packet facts, validates citation scope, supports classification output, and preserves the existing independent corroboration/review/application boundary.",
+  "behavior_before": "Bounded provider packets contained admitted asset content but not the Estate's revision-grounded evidence facts. The prior real acceptance preserved only unresolved, summary-only, or no-claim output.",
+  "change_id": "PL-0040-EVIDENCE-ENRICHED-COMPREHENSION-20260810",
+  "changed_artifacts": [
+    {
+      "head_git_blob": "1cb6c6698e4024f65583179316b352957015be53",
+      "path": "src/estate/core/estate_population.py",
+      "sha256": "05ad16c91e605f50ccb50d0e95a4cf317a329dba1345d654f7ab04cd64006511",
+      "state": "DIRTY",
+      "worktree_git_blob": "8e7abc71900560bd067d8d54a202d55f8a7b2be2",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "205ac7398cac1422090502e4e8ae6c8af5f59317",
+      "path": "src/estate/core/estate_comprehension_worker.py",
+      "sha256": "3e93f3d12326f9fbe8b98c68598a1d999e323df8d0cb77cc36592a54830d501e",
+      "state": "DIRTY",
+      "worktree_git_blob": "e922b1fe4ee354d69d02755c54e3b78eca4f2e5f",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "73a0abee1ecfffee289b6a44413cf128c373dde2",
+      "path": "src/estate/core/estate_comprehension_governance.py",
+      "sha256": "58099913a78b477fb4aef201ac09848e796dce8e5c7ea065d46ac4c564e6c819",
+      "state": "DIRTY",
+      "worktree_git_blob": "95b5829d7cf4791f30fab1851d73ae825345f71a",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "69c9b7fd04f516bba8c6ae684effdff4d05002ad",
+      "path": "src/estate/cli/main.py",
+      "sha256": "327131f02b4cba88be511ccafb437c4595b244e60eb8e32fca84a997d94f75e2",
+      "state": "DIRTY",
+      "worktree_git_blob": "c4c815179c62a36532f3b084bdd3b6341563fd89",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "76eac12b1dcae2989b6cb559c42f8cae2a9b171a",
+      "path": "schemas/troubleshooting/comprehension_result_v1.schema.json",
+      "sha256": "609cc95bc075feaee0f04d0497f52951c464197b6e0b362c5abcf8d557d0c0ca",
+      "state": "DIRTY",
+      "worktree_git_blob": "4aeeaae72f5c56e537f3ee98b738243e62b2e97d",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "eaca1cc52af49e4c3720a272ecfc642861150946",
+      "path": "tests/test_estate_comprehension_worker.py",
+      "sha256": "5234b0a50445e1e615fe6d4ff8424581f3861458007934d9f85bd41e3c808ab7",
+      "state": "DIRTY",
+      "worktree_git_blob": "553d04452450fea3baa423e346bf85ee1e4a9b1c",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "753a1361ca3dd0fc6dcfc82b82b5e593e8f6416d",
+      "path": "tests/test_estate_population.py",
+      "sha256": "fa50d33872d000959bbbf1fcf6b323bbd4464599487400895449d1fd8baea707",
+      "state": "DIRTY",
+      "worktree_git_blob": "576ff74e2ec00cfd2a6141e813cb29f71799d18e",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "a89a4442248e116ddf62a4064e831f708b863cfe",
+      "path": "tests/test_estate_comprehension_governance.py",
+      "sha256": "c9a1b40a97098536aef31915403f75569526a8f6bfc388def3937a13b8e54f30",
+      "state": "DIRTY",
+      "worktree_git_blob": "485afce8dbe6647334fc0c018563fd79fe1e99a6",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "HEAD:docs/operations/troubleshooting/impacts/PL-0040-POSITIVE-APPLICATION-20260810.json",
+      "path": "docs/operations/troubleshooting/impacts/PL-0040-POSITIVE-APPLICATION-20260810.json",
+      "sha256": "512ccab239a5f5bbcaa567dba1d75bdc8d889e7ca0c0cb2881f831bbd4eac995",
+      "state": "UNTRACKED",
+      "worktree_git_blob": "c8d7144a544d97a242b9a4313514591853441d93",
+      "worktree_state": "untracked"
+    },
+    {
+      "head_git_blob": "HEAD:docs/operations/troubleshooting/impacts/PL-0040-POSITIVE-APPLICATION-20260810.request.json",
+      "path": "docs/operations/troubleshooting/impacts/PL-0040-POSITIVE-APPLICATION-20260810.request.json",
+      "sha256": "2ce4cc095d871927c043cd4a015ac85e6d3d42240ac0b7db0a6f7366e7cd94e1",
+      "state": "UNTRACKED",
+      "worktree_git_blob": "6580646af28671632f45668c0c655eb3dea6eb75",
+      "worktree_state": "untracked"
+    },
+    {
+      "head_git_blob": "HEAD:docs/operations/troubleshooting/impacts/PL-0040-EVIDENCE-ENRICHED-COMPREHENSION-20260810.request.json",
+      "path": "docs/operations/troubleshooting/impacts/PL-0040-EVIDENCE-ENRICHED-COMPREHENSION-20260810.request.json",
+      "sha256": "dee831d76fa05821633cc69c8ed3b8db1fb0f39af074aac67e5995b4e591d5dd",
+      "state": "UNTRACKED",
+      "worktree_git_blob": "7deddb98ca41e6235a4ea208b50ee989f0b1b79c",
+      "worktree_state": "untracked"
+    }
+  ],
+  "changed_components": [
+    "estate_population",
+    "estate_comprehension_worker",
+    "estate_knowledge_index",
+    "living_diagnostics"
+  ],
+  "changed_failure_modes": [
+    "provider context is richer while filesystem/database authority remains excluded"
+  ],
+  "changed_files": [
+    "src/estate/core/estate_population.py",
+    "src/estate/core/estate_comprehension_worker.py",
+    "src/estate/core/estate_comprehension_governance.py",
+    "src/estate/cli/main.py",
+    "schemas/troubleshooting/comprehension_result_v1.schema.json",
+    "tests/test_estate_comprehension_worker.py",
+    "tests/test_estate_population.py",
+    "tests/test_estate_comprehension_governance.py",
+    "docs/operations/troubleshooting/impacts/PL-0040-POSITIVE-APPLICATION-20260810.json",
+    "docs/operations/troubleshooting/impacts/PL-0040-POSITIVE-APPLICATION-20260810.request.json",
+    "docs/operations/troubleshooting/impacts/PL-0040-EVIDENCE-ENRICHED-COMPREHENSION-20260810.request.json"
+  ],
+  "changed_schemas": [
+    "schemas/troubleshooting/comprehension_result_v1.schema.json"
+  ],
+  "confidence": "CANDIDATE",
+  "dependencies_called": [
+    "SQLite v5 store",
+    "governed inventory scan",
+    "Ollama qwen3:8b",
+    "Ollama qwen3-coder:30b-qwencode-20k",
+    "knowledge-index CLI"
+  ],
+  "dependencies_read": [
+    "PL-0040",
+    "v5 Estate Knowledge Index",
+    "deterministic evidence engine",
+    "candidate governance/application",
+    "local-AI worker",
+    "prior failed acceptance packets"
+  ],
+  "estate_change_id": "PL-0040-EVIDENCE-ENRICHED-LOCAL-COMPREHENSION",
+  "expected_inputs": [
+    "admitted structural assets",
+    "current source hashes/revision",
+    "current deterministic evidence facts",
+    "bounded local model"
+  ],
+  "expected_outputs": [
+    "evidence-enriched packet",
+    "fact-cited candidate assertions",
+    "independent corroboration",
+    "non-provider review/application state"
+  ],
+  "implementation_revision": "b240d8825239ab6be47a4687865fcb2659d11090",
+  "new_failure_modes": [
+    "stale inventory blocks packet creation",
+    "positive claims without packet fact IDs fail closed",
+    "same-asset model comparison requires explicit bounded reprocessing",
+    "classification projection must not overwrite purpose"
+  ],
+  "packet_version": "1.0.0",
+  "prohibited_recovery_actions": [
+    "provider self-approval",
+    "canonical promotion",
+    "scheduler activation",
+    "filesystem scope expansion",
+    "GPU stress or reset",
+    "source deletion, archival, or deprecation"
+  ],
+  "recommended_checkpoint_impacts": [
+    "LD-RECONCILIATION",
+    "LD-DEVELOPER-INGESTION"
+  ],
+  "resources_written": [
+    "runtime/search/estate_knowledge_index.sqlite3 candidate, evidence, review, and application history"
+  ],
+  "source_revision": "b240d8825239ab6be47a4687865fcb2659d11090",
+  "tests_added_or_changed": [
+    "tests/test_estate_comprehension_worker.py",
+    "tests/test_estate_population.py"
+  ],
+  "validation_evidence": [
+    "same real comprehension_result_v1 schema received 13 bounded independent facts for both models",
+    "qwen3:8b emitted cited SCHEMA classification/tag; qwen3-coder emitted cited classification/tag and narrow purpose",
+    "five assertions independently corroborated and applied for the primary asset",
+    "bounded three-asset coder pilot produced eight additionally applied low-risk assertions",
+    "resident-neutral Grace, Historian, and Researcher queries returned the applied projection/history",
+    "reversal history preserved the classification projection correction and final purpose application",
+    "76 focused/relevant tests passed",
+    "prior failed acceptance artifacts preserved as historical evidence"
+  ],
+  "work_package_id": "PL-0040-LIVING-FOUNDATION"
+}

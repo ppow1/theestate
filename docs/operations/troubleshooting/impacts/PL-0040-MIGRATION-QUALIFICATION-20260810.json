@@ -1,0 +1,260 @@
+{
+  "activation_restart_impact": "No service, daemon, scheduler, GPU, Windows, Grace, or runtime activation change.",
+  "author_provenance": {
+    "actor": "Pat / Steward-authorized Codex with bounded local-AI evidence",
+    "kind": "MIXED"
+  },
+  "behavior_after": "Governed scans deterministically refresh admitted migration revisions while preserving history; packet construction verifies current repository revision, asset revision/hash/Git blob, and evidence-source hash before generation; migration packets select narrow typed evidence; migration assertions require packet-local authorized citations; pre-dispatch failures preserve no fabricated provider output; current full-population routing selects coder with review and disallows qwen3:8b for the class.",
+  "behavior_before": "Migration qualification stopped after a coder result omitted citations and a README batch selected indexed revision/hash state from before the source changed. Packet creation checked content hash but not batch/repository revision, indexed Git blob, or evidence-source hashes; a pre-dispatch packet error could inherit prior-loop raw response metadata.",
+  "change_id": "PL-0040-MIGRATION-QUALIFICATION-20260810",
+  "changed_artifacts": [
+    {
+      "head_git_blob": "e657440726c019a7b80eedf851e2f31b1f9152a8",
+      "path": "src/estate/core/estate_population.py",
+      "sha256": "28e95ded458acb19c4ca8d652719564550e59f146df00df5e467b53f22570666",
+      "state": "DIRTY",
+      "worktree_git_blob": "ad34309004acd9a37355c073e06f50863e6a5af1",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "70c6eb771fe7f8a7325147d25d8a43965a6834ec",
+      "path": "src/estate/core/estate_deterministic_evidence.py",
+      "sha256": "9fa3b0b7171f462eed1fa7e8abbcf1751282292402eba25a5af4b5f0f481a5fd",
+      "state": "DIRTY",
+      "worktree_git_blob": "2563b8263fae533b145608a3cc47ab46b9e4d04e",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "bbc613f76f865e127295a5c4df6cff50d6d60aee",
+      "path": "src/estate/core/estate_comprehension_worker.py",
+      "sha256": "b92656b916ff6d82fde126ec3a6596ff1ae4d29250cbe6f9e1c4dcaf3d89fd8d",
+      "state": "DIRTY",
+      "worktree_git_blob": "b08de1da8343bc0fa3cd585422e06c242071545a",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "95b5829d7cf4791f30fab1851d73ae825345f71a",
+      "path": "src/estate/core/estate_comprehension_governance.py",
+      "sha256": "0bb5fd404eb94432a455aed8e4409484648ab6aa1a4d044bbafecd30c5116d11",
+      "state": "DIRTY",
+      "worktree_git_blob": "ca4fe9f5cc4100bbe5c279c53b150c2912a4e91e",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "a5560b57209c863db73512c0a219596a3e257e48",
+      "path": "src/estate/core/estate_comprehension_routing.py",
+      "sha256": "9e05b72e0b752875ac9b5e4f818f89f9b93866b9dba8070d95979fa4c4b8904d",
+      "state": "DIRTY",
+      "worktree_git_blob": "64dbc9f2f8dec05aa3cbe8523973848a7d406f2a",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "2a4e334a70dea9f4a2245699a9d7dcc4641d4a71",
+      "path": "schemas/troubleshooting/comprehension_result_v1.schema.json",
+      "sha256": "69158ed56ebe40e57e27651f3ca2faaa70f58f256c51d22a48e347414a3ab6ff",
+      "state": "DIRTY",
+      "worktree_git_blob": "4894ec91b5764bc9381b043d8231b78fdbffa017",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "8fd0ca0ea752a6e87bce8bd9ef215611ea15b92e",
+      "path": "migrations/estate_knowledge_store/README.md",
+      "sha256": "09880b40392c669c426f76da8d28c2c66d3d8796c83f7ae9867dcb59062b516c",
+      "state": "DIRTY",
+      "worktree_git_blob": "e5fdf6057ff1e0379069d5be910071a96f38fd3f",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "977fd26f516e8c1147a89a2ce1c6db8a3def45de",
+      "path": "docs/operations/troubleshooting/README.md",
+      "sha256": "ec22846addd71c93f084108ffdd856e054ad46e3903828b7f928e7c4ac7c4398",
+      "state": "DIRTY",
+      "worktree_git_blob": "cdfc891d6dcd4ead22c8d2ce2ecb3902610852ff",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "576ff74e2ec00cfd2a6141e813cb29f71799d18e",
+      "path": "tests/test_estate_population.py",
+      "sha256": "2c99c1080746480962d32d24857186c44e81a1e99ebdae84de558427e0ebe0e9",
+      "state": "DIRTY",
+      "worktree_git_blob": "2a2566fc8ab7948d282f5fd54da1881372850b74",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "a7be033430cf06884106d1c28bda7a42be584a1c",
+      "path": "tests/test_estate_comprehension_worker.py",
+      "sha256": "9b775aedbd2026e39e1d8d01ea61067f28a6051fdce3e3d021d3261b5e9aea08",
+      "state": "DIRTY",
+      "worktree_git_blob": "ae5a1bf8fc4801d1c1b5febeb388a8c12def8a4b",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "19d35709ebacddeb17863c3ae4b3e674c9e13474",
+      "path": "tests/test_estate_deterministic_evidence.py",
+      "sha256": "be4bd5a9df9ee8c5e96db6825f871f73129b2aed4da412814181d273defa4e86",
+      "state": "DIRTY",
+      "worktree_git_blob": "f77621555b511c2d8157d6be23f310589192591a",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "805d125e47439809cb790d911ac89fcaf0453f2d",
+      "path": "tests/test_estate_comprehension_governance.py",
+      "sha256": "ed30d8d87580dde0231d98e2a0795364cc93c4fa59f817a4e8f68d113bf3419f",
+      "state": "DIRTY",
+      "worktree_git_blob": "2211ae811ebb5f46bbf60fc20dbbaf9b20c6606f",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "239c0acc1d2d407339be0a113db2540b58b4d836",
+      "path": "tests/test_estate_comprehension_routing.py",
+      "sha256": "b527024572a3e73962ac76c139c1e8bd6485c3acf543838c448cc0a428c26c61",
+      "state": "DIRTY",
+      "worktree_git_blob": "a48c5e252dec8c558edb9de36f1d1b2da134acf0",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "452b8e0357304925061b515e7126732eefa13c97",
+      "path": "collaboration/parking_lot/PL-0040-estate-cookbook-troubleshooting.md",
+      "sha256": "52bebe0af243930f90c05f63eb17d2c7082db83db26d903355a8f57327622f75",
+      "state": "DIRTY",
+      "worktree_git_blob": "1f5cd1200a6bc53457c7aaff65112e87d0b76722",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "6d376e250292c3e7e5faa36013bab1b885a66696",
+      "path": "docs/operations/troubleshooting/impacts/PL-0040-LEVEL1-QUALIFICATION-MATRIX-20260810.json",
+      "sha256": "089a7019d96940f5b81c4e5de0ddbe76e43cd28090dddb361927bbccc3c96c70",
+      "state": "DIRTY",
+      "worktree_git_blob": "780a5ead7b36f9cb8d8ddcdc6443e0120f44cbe9",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "HEAD:docs/operations/troubleshooting/impacts/PL-0040-MIGRATION-QUALIFICATION-20260810.request.json",
+      "path": "docs/operations/troubleshooting/impacts/PL-0040-MIGRATION-QUALIFICATION-20260810.request.json",
+      "sha256": "e22699f9ccd40e10026f9366882f1fe93ec796202aadd6eacdfd4c299caa3adf",
+      "state": "UNTRACKED",
+      "worktree_git_blob": "149a356ea3ee0416e165e433f36345c30158fbec",
+      "worktree_state": "untracked"
+    }
+  ],
+  "changed_components": [
+    "estate_population",
+    "estate_deterministic_evidence",
+    "estate_comprehension_worker",
+    "estate_comprehension_governance",
+    "estate_comprehension_routing",
+    "living_diagnostics"
+  ],
+  "changed_failure_modes": [
+    "stale batch revision, stale asset hash/blob, and stale evidence now fail before provider generation with precise revalidation codes",
+    "pre-dispatch failures no longer inherit prior-loop raw output or result identity"
+  ],
+  "changed_files": [
+    "src/estate/core/estate_population.py",
+    "src/estate/core/estate_deterministic_evidence.py",
+    "src/estate/core/estate_comprehension_worker.py",
+    "src/estate/core/estate_comprehension_governance.py",
+    "src/estate/core/estate_comprehension_routing.py",
+    "schemas/troubleshooting/comprehension_result_v1.schema.json",
+    "migrations/estate_knowledge_store/README.md",
+    "docs/operations/troubleshooting/README.md",
+    "tests/test_estate_population.py",
+    "tests/test_estate_comprehension_worker.py",
+    "tests/test_estate_deterministic_evidence.py",
+    "tests/test_estate_comprehension_governance.py",
+    "tests/test_estate_comprehension_routing.py",
+    "collaboration/parking_lot/PL-0040-estate-cookbook-troubleshooting.md",
+    "docs/operations/troubleshooting/impacts/PL-0040-LEVEL1-QUALIFICATION-MATRIX-20260810.json",
+    "docs/operations/troubleshooting/impacts/PL-0040-MIGRATION-QUALIFICATION-20260810.request.json"
+  ],
+  "changed_schemas": [
+    "schemas/troubleshooting/comprehension_result_v1.schema.json"
+  ],
+  "confidence": "SUPPORTED",
+  "dependencies_called": [
+    "Git",
+    "SQLite",
+    "governed knowledge-index scan/evidence/work/review/application CLI",
+    "loopback Ollama provider"
+  ],
+  "dependencies_read": [
+    "PL-0040",
+    "published Level-1 matrix at 32af6cd89f4e0036945327b282990619d66f79e9",
+    "SQLite estate.knowledge_store.v7",
+    "governed population scope",
+    "deterministic evidence engine",
+    "candidate review/application policy"
+  ],
+  "estate_change_id": "PL-0040-MIGRATION-CLASS-REVALIDATION-AND-QUALIFICATION",
+  "expected_inputs": [
+    "two admitted migration assets",
+    "current Git revision/blob/content hashes",
+    "current deterministic migration facts",
+    "bounded qwen3:8b and qwen3-coder routes"
+  ],
+  "expected_outputs": [
+    "precise pre-provider revalidation failures",
+    "migration-specific packet facts",
+    "packet-local assertion citations",
+    "governed review/application history",
+    "full Level-1 routing matrix and scheduler recommendation"
+  ],
+  "implementation_revision": "32af6cd89f4e0036945327b282990619d66f79e9",
+  "new_failure_modes": [
+    "a model may emit evidence-backed but packet-unauthorized migration assertion kinds"
+  ],
+  "new_or_changed_status_codes": [
+    "STALE_PACKET_SOURCE_REVISION",
+    "ASSET_REVALIDATION_REQUIRED",
+    "STALE_ASSET_CONTENT_HASH",
+    "STALE_ASSET_GIT_BLOB",
+    "REVALIDATION_REQUIRED",
+    "EVIDENCE_NOT_AUTHORIZED_FOR_ASSERTION"
+  ],
+  "packet_version": "1.0.0",
+  "preliminary_troubleshooting_notes": [
+    "Run governed scan/evidence extraction before retrying a stale migration unit",
+    "Treat qwen3:8b as disallowed for current migration work",
+    "Do not apply component linkage onto purpose_summary when a distinct purpose is already approved"
+  ],
+  "prohibited_recovery_actions": [
+    "manual SQLite row overwrite",
+    "marking stale work current without scan",
+    "provider self-approval",
+    "citation/source-revision safeguard weakening",
+    "canonical promotion",
+    "Scheduler activation",
+    "Grace/parallelism/GPU lane changes",
+    "force push"
+  ],
+  "recommended_checkpoint_impacts": [
+    "LD-RECONCILIATION",
+    "LD-DEVELOPER-INGESTION",
+    "PL-0040-LEVEL1-QUALIFICATION"
+  ],
+  "resources_written": [
+    "runtime/search/estate_knowledge_index.sqlite3 scan, evidence, attempt, candidate, review, application, routing, and coverage state"
+  ],
+  "source_revision": "32af6cd89f4e0036945327b282990619d66f79e9",
+  "tests_added_or_changed": [
+    "stale migration detection",
+    "pre-provider stale packet block",
+    "deterministic refresh and current packet",
+    "migration evidence selection",
+    "typed citation authorization",
+    "raw-output isolation",
+    "migration review/application idempotency",
+    "current full-population routing"
+  ],
+  "validation_evidence": [
+    "historical README index stopped at revision 800634b946a05018666dd7ad9c08910585d14ba1/hash a4f3cc27 while source changed at b240d882 and starting HEAD content hash was 00bdd459",
+    "governed migrations scan processed both admitted assets at 32af6cd89f4e0036945327b282990619d66f79e9 and preserved prior asset_revisions",
+    "controlled stale-packet test proved provider generation was not called and raw_output remained null",
+    "qwen3:8b produced 0/2 valid current results; both unauthorized assertion-kind failures were preserved and not admitted",
+    "qwen3-coder produced 2/2 validated current candidates covering the entire two-asset migration population",
+    "seven accepted positive assertions were deterministically corroborated; three low-risk projections were applied non-canonically and duplicate application returned zero",
+    "both migration assets advanced PARTIAL to COMPREHENDED only after governed application under existing coverage semantics",
+    "SQLite integrity_check remained ok; active work units remained zero; Scheduler and GPU/Windows/Grace lanes were untouched"
+  ],
+  "work_package_id": "PL-0040-LIVING-FOUNDATION"
+}

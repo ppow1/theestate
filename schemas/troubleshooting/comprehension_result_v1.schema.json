@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estate://schemas/troubleshooting/comprehension_result_v1",
+  "title": "Estate bounded comprehension result v1",
+  "type": "object",
+  "required": ["contract", "result_id", "batch_id", "source_revision", "provider", "items"],
+  "properties": {
+    "contract": {"const": "estate.troubleshooting.comprehension.result.v1"},
+    "result_id": {"type": "string", "minLength": 1},
+    "batch_id": {"type": "string", "minLength": 1},
+    "source_revision": {"type": "string", "minLength": 1},
+    "provider": {
+      "type": "object",
+      "required": ["type", "worker_identity"],
+      "properties": {"type": {"type": "string"}, "model": {"type": ["string", "null"]}, "worker_identity": {"type": "string"}},
+      "additionalProperties": false
+    },
+    "packet_version": {"const": "estate.troubleshooting.comprehension.work_packet.v2"},
+    "prompt_contract_version": {"const": "estate.troubleshooting.evidence_enriched_prompt.v2"},
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["asset_id"],
+        "properties": {
+          "asset_id": {"type": "string", "minLength": 1},
+          "lifecycle": {"enum": ["CANDIDATE", "PROPOSED"]},
+          "purpose": {"type": ["string", "null"]},
+          "owner_candidate": {"type": ["string", "null"]},
+          "summary": {"type": ["string", "null"]},
+          "classification": {"type": ["string", "null"]},
+          "tags": {"type": "array", "items": {"type": "string"}},
+          "assertions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["kind", "value", "evidence_refs"],
+              "properties": {
+                "kind": {"enum": ["MIGRATION_CLASSIFICATION", "PURPOSE", "SCHEMA_VERSION_TRANSITION", "AFFECTED_TABLE", "AFFECTED_INDEX", "COMPONENT_LINKAGE", "MIGRATION_ORDER_RELATIONSHIP"]},
+                "value": {"type": ["string", "null"]},
+                "evidence_refs": {"type": "array", "items": {"type": "string", "pattern": "^fact:[0-9a-f]{64}$"}}
+              },
+              "additionalProperties": false
+            }
+          },
+          "unresolved_questions": {"type": "array", "items": {"type": "string"}},
+          "evidence_refs": {"type": "array", "items": {"type": "string", "pattern": "^fact:[0-9a-f]{64}$"}},
+          "verification_state": {"type": "string"}
+        },
+        "additionalProperties": false
+      }
+    },
+    "quality": {"enum": ["ACCEPTED_CANDIDATE", "PARTIAL_CANDIDATE", "NEEDS_MORE_CONTEXT", "RETRYABLE_PROVIDER_FAILURE", "INVALID_RESULT", "CONFLICT_REVIEW_REQUIRED", "HIGHER_REASONING_REQUIRED", "HUMAN_REVIEW_REQUIRED"]},
+    "telemetry": {"type": "object"},
+    "context_requests": {"type": "array", "items": {"type": "string"}},
+    "unsupported_assertions": {"type": "array", "items": {"type": "string"}}
+  },
+  "additionalProperties": false
+}

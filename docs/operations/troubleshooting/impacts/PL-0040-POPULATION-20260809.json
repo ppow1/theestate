@@ -1,0 +1,207 @@
+{
+  "activation_restart_impact": "No daemon or scheduler restart; migration 2 is applied when the existing CLI opens the runtime projection. The current local SQLite writer boundary remains.",
+  "author_provenance": {
+    "actor": "Pat / Steward authorized Codex",
+    "kind": "HUMAN"
+  },
+  "behavior_after": "The existing owner validates the governed theestate worktree before traversal, inventories only admitted policy paths, records scope/boundary state, selects resumable bounded batches, builds content-limited provider packets, and ingests candidate-only results with provenance, idempotency, and conflict protection.",
+  "behavior_before": "The SQLite knowledge index could inventory an explicitly supplied path but had no governed admission contract, metadata/no-content policy enforcement, bounded work queue, or provider-result ingestion boundary.",
+  "change_id": "PL-0040-POPULATION-20260809",
+  "changed_artifacts": [
+    {
+      "head_git_blob": "50f0f941c5487b21a32258daade58575b942e0c1",
+      "path": "schemas/troubleshooting/population_scope_v1.schema.json",
+      "sha256": "ddb11f4ea0016ee6c02c0c1c34557ea1d9755cb6d75acda18ed74bd46b87887f",
+      "state": "CLEAN",
+      "worktree_git_blob": "50f0f941c5487b21a32258daade58575b942e0c1",
+      "worktree_state": "clean"
+    },
+    {
+      "head_git_blob": "3adc5d24ae61415a98285e9aec9b10017685a4e3",
+      "path": "schemas/troubleshooting/comprehension_result_v1.schema.json",
+      "sha256": "cf1d682469780d60997e3ac63e1c78422c1aaa24ff6ba867bb75918a739a1641",
+      "state": "CLEAN",
+      "worktree_git_blob": "3adc5d24ae61415a98285e9aec9b10017685a4e3",
+      "worktree_state": "clean"
+    },
+    {
+      "head_git_blob": "b7d1dd9dd5c06fed03a049b4d4e626b0b50aca4c",
+      "path": "data/schemas/estate_knowledge_store_v2.schema.json",
+      "sha256": "bc99ffac9e29187a11fd80e5f998348a0dfc8c38371cfde3dd180a3360682a38",
+      "state": "CLEAN",
+      "worktree_git_blob": "b7d1dd9dd5c06fed03a049b4d4e626b0b50aca4c",
+      "worktree_state": "clean"
+    },
+    {
+      "head_git_blob": "481419472306c607892a8203add223935b6303c2",
+      "path": "docs/operations/troubleshooting/population-scope.json",
+      "sha256": "eae168505858941025d73a29be350f7434bb27294e28740ab18c5713755ee938",
+      "state": "CLEAN",
+      "worktree_git_blob": "481419472306c607892a8203add223935b6303c2",
+      "worktree_state": "clean"
+    },
+    {
+      "head_git_blob": "96f1a20c67981be9fc0b35d7e8536d979ddc7b9f",
+      "path": "src/estate/core/estate_population.py",
+      "sha256": "1e57b99e2953f0d496a1a7c19b2d1c8a1cb9e6370a71ee46765fa31d803406bb",
+      "state": "DIRTY",
+      "worktree_git_blob": "293c50de636f293fa4a7966549a97a00506198ba",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "59e7d12e84920ab967f07a4ed57ebc82a675ba9e",
+      "path": "src/estate/core/estate_knowledge_store.py",
+      "sha256": "82ffa80b1446e56ce4cfa8ba58b647239f7b7b8d07338b5513a98084c1d60493",
+      "state": "CLEAN",
+      "worktree_git_blob": "59e7d12e84920ab967f07a4ed57ebc82a675ba9e",
+      "worktree_state": "clean"
+    },
+    {
+      "head_git_blob": "ce21114d076c851d6e8b6bff27df6e191e3d917e",
+      "path": "src/estate/core/estate_knowledge_index.py",
+      "sha256": "b7f7a4cfb5f2740ecec8be7c981d10d3e36b88bc7a824a192d66bebb7719e527",
+      "state": "CLEAN",
+      "worktree_git_blob": "ce21114d076c851d6e8b6bff27df6e191e3d917e",
+      "worktree_state": "clean"
+    },
+    {
+      "head_git_blob": "786a59b191bf8efa6f72164ebebb0e978e49637d",
+      "path": "src/estate/cli/main.py",
+      "sha256": "fb969328627c970600510bb99f2c64cc516f83dcabe1e4a07f354e8c9c23e4c2",
+      "state": "DIRTY",
+      "worktree_git_blob": "24e2f30acf147b1814637fd96b757eb2a1f747a6",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "4ff764fc50804742a7f14305d8db2198c7950316",
+      "path": "tests/test_estate_population.py",
+      "sha256": "0898394226c33a3a892578fdc780ff6de24abcf241e82e96ee4505793b839e17",
+      "state": "CLEAN",
+      "worktree_git_blob": "4ff764fc50804742a7f14305d8db2198c7950316",
+      "worktree_state": "clean"
+    },
+    {
+      "head_git_blob": "ce96dbe75d7ecfa727d32bdd984b6a1bba1f5bf1",
+      "path": "docs/operations/troubleshooting/README.md",
+      "sha256": "e08817448f042be567697059e1760212e94091ef631c1021eb22c61eefa4efd7",
+      "state": "CLEAN",
+      "worktree_git_blob": "ce96dbe75d7ecfa727d32bdd984b6a1bba1f5bf1",
+      "worktree_state": "clean"
+    },
+    {
+      "head_git_blob": "b7623a3ae018a16c8f8bd69f0bb58e8c4d9e6f07",
+      "path": "migrations/estate_knowledge_store/README.md",
+      "sha256": "a4f3cc27e35b25bce638490cdd98e6ce0b1ab013e150ff7694b13e47b4e63491",
+      "state": "CLEAN",
+      "worktree_git_blob": "b7623a3ae018a16c8f8bd69f0bb58e8c4d9e6f07",
+      "worktree_state": "clean"
+    },
+    {
+      "head_git_blob": "86fb00d1e1abaacecc0f48c4e43f421428b7d765",
+      "path": "collaboration/parking_lot/PL-0040-estate-cookbook-troubleshooting.md",
+      "sha256": "658dd533ab3dbdad7eda6a1bbffafa63b62c8ac3c44f8b8c2be02fc182544d4c",
+      "state": "CLEAN",
+      "worktree_git_blob": "86fb00d1e1abaacecc0f48c4e43f421428b7d765",
+      "worktree_state": "clean"
+    },
+    {
+      "head_git_blob": "cfb542f3bd6edf2343c1218e111d5c4a930ebd80",
+      "path": "operations/boards/parking_lot_items/PL-0040_ESTATE_COOKBOOK_TROUBLESHOOTING.md",
+      "sha256": "d1d71b20105a7079a16915b697917198003ddce6b260afeab58da9621d147f43",
+      "state": "CLEAN",
+      "worktree_git_blob": "cfb542f3bd6edf2343c1218e111d5c4a930ebd80",
+      "worktree_state": "clean"
+    }
+  ],
+  "changed_components": [
+    "estate_knowledge_index",
+    "estate_governed_population",
+    "estate_diagnostics_cli"
+  ],
+  "changed_failure_modes": [
+    "full repository inventory is deterministic and bounded by policy rather than arbitrary CLI roots"
+  ],
+  "changed_files": [
+    "schemas/troubleshooting/population_scope_v1.schema.json",
+    "schemas/troubleshooting/comprehension_result_v1.schema.json",
+    "data/schemas/estate_knowledge_store_v2.schema.json",
+    "docs/operations/troubleshooting/population-scope.json",
+    "src/estate/core/estate_population.py",
+    "src/estate/core/estate_knowledge_store.py",
+    "src/estate/core/estate_knowledge_index.py",
+    "src/estate/cli/main.py",
+    "tests/test_estate_population.py",
+    "docs/operations/troubleshooting/README.md",
+    "migrations/estate_knowledge_store/README.md",
+    "collaboration/parking_lot/PL-0040-estate-cookbook-troubleshooting.md",
+    "operations/boards/parking_lot_items/PL-0040_ESTATE_COOKBOOK_TROUBLESHOOTING.md"
+  ],
+  "changed_schemas": [
+    "schemas/troubleshooting/population_scope_v1.schema.json",
+    "schemas/troubleshooting/comprehension_result_v1.schema.json"
+  ],
+  "confidence": "CANDIDATE",
+  "dependencies_called": [
+    "Git tree/status identity",
+    "Python sqlite3",
+    "existing diagnostics CLI owner"
+  ],
+  "dependencies_read": [
+    "existing Estate Knowledge Index",
+    "SQLite migration owner",
+    "comprehension model",
+    "Living Diagnostics and PL-0040 guidance"
+  ],
+  "estate_change_id": "PL-0040-GOVERNED-POPULATION",
+  "expected_inputs": [
+    "governed population scope",
+    "theestate Git worktree",
+    "bounded batch size",
+    "provider result keyed to assigned asset IDs"
+  ],
+  "expected_outputs": [
+    "scope validation/report",
+    "deterministic inventory",
+    "coverage ledger",
+    "comprehension batch",
+    "provider-neutral packet",
+    "candidate interpretation"
+  ],
+  "implementation_revision": "WORKTREE",
+  "new_failure_modes": [
+    "scope escape rejected before traversal",
+    "provider result outside assigned batch rejected",
+    "incompatible provider result or self-promotion rejected"
+  ],
+  "packet_version": "1.0.0",
+  "preliminary_troubleshooting_notes": [
+    "If a population run times out, inspect the exact worker process and SQLite lock; do not widen scope or kill unrelated Estate services. Re-run the bounded governed scan after the lock is reconciled."
+  ],
+  "prohibited_recovery_actions": [
+    "Do not scan C: or arbitrary A: siblings",
+    "Do not let providers add paths",
+    "Do not send metadata-only/no-content assets to providers",
+    "Do not promote candidate interpretations",
+    "Do not launch unattended AI population"
+  ],
+  "recommended_checkpoint_impacts": [
+    "LD-RECONCILIATION",
+    "LD-DEVELOPER-INGESTION"
+  ],
+  "resources_written": [
+    "runtime/search/estate_knowledge_index.sqlite3",
+    "scope and batch tables"
+  ],
+  "source_revision": "WORKTREE",
+  "tests_added_or_changed": [
+    "tests/test_estate_population.py"
+  ],
+  "validation_evidence": [
+    "5,826 admitted assets inventoried in 38.06 seconds at committed revision",
+    "scope escape and excluded-boundary tests",
+    "one three-asset and three two-asset provider packets across diagnostics, Estate core, and troubleshooting scopes",
+    "candidate ingestion idempotency and conflict preservation",
+    "62 focused population/index/Living Diagnostics tests"
+  ],
+  "work_package_id": "PL-0040-LIVING-FOUNDATION"
+}

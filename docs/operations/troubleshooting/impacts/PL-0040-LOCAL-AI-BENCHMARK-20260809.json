@@ -1,0 +1,141 @@
+{
+  "activation_restart_impact": "No daemon or scheduler restart; worker remains operator-invoked and SQLite remains a rebuildable runtime projection.",
+  "author_provenance": {
+    "actor": "Pat / Steward authorized Codex",
+    "kind": "HUMAN"
+  },
+  "behavior_after": "Requested scans limit missing-state reconciliation to the requested subtree, and Estate-owned result identity prevents provider placeholder collisions while preserving conflict handling.",
+  "behavior_before": "A bounded scan requested for one asset could mark unrelated indexed assets missing, and repeated provider placeholder result IDs could turn valid independent batches into conflicts.",
+  "change_id": "PL-0040-LOCAL-AI-BENCHMARK-20260809",
+  "changed_artifacts": [
+    {
+      "head_git_blob": "f2db55be2e4e84c27cbd5c322ac2d95fa0ef9c5b",
+      "path": "src/estate/core/estate_population.py",
+      "sha256": "b7bd4eb51171cb0739d425abe24f2b9504a59736f960635cb4f3bed779bf3d8c",
+      "state": "DIRTY",
+      "worktree_git_blob": "1cb6c6698e4024f65583179316b352957015be53",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "b5a78b8413d8aabe3cc699f31f7535ec128c79d6",
+      "path": "src/estate/core/estate_comprehension_worker.py",
+      "sha256": "08d3d022c70ba13d9351e03e6a6ac49b026cf543794149f69c8753c16ebbd12c",
+      "state": "DIRTY",
+      "worktree_git_blob": "205ac7398cac1422090502e4e8ae6c8af5f59317",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "4ff764fc50804742a7f14305d8db2198c7950316",
+      "path": "tests/test_estate_population.py",
+      "sha256": "c61b52baee5d0ecb0159530486ea63cb92fb05ebbfba52baaab0274705e20a1b",
+      "state": "DIRTY",
+      "worktree_git_blob": "753a1361ca3dd0fc6dcfc82b82b5e593e8f6416d",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "c88db97b1fbd14229ace74cd2c29635617920a62",
+      "path": "tests/test_estate_comprehension_worker.py",
+      "sha256": "ac91dfc7d33dbd8e1df7546f80488a6beb824cef8e74dca7d4566990a11d76cf",
+      "state": "DIRTY",
+      "worktree_git_blob": "eaca1cc52af49e4c3720a272ecfc642861150946",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "HEAD:docs/operations/troubleshooting/benchmarks/PL-0040-LOCAL-AI-BENCHMARK-20260809.json",
+      "path": "docs/operations/troubleshooting/benchmarks/PL-0040-LOCAL-AI-BENCHMARK-20260809.json",
+      "sha256": "42b49f92d2b7302eeb998e57d674de13d42483c0a239fda841cd589ead007c63",
+      "state": "UNTRACKED",
+      "worktree_git_blob": "b615a630ff93b8e78b9fdb827675f3de7a2282ce",
+      "worktree_state": "untracked"
+    },
+    {
+      "head_git_blob": "8535861521734a8c5d2fd524dfe95b116e717dd6",
+      "path": "collaboration/parking_lot/PL-0040-estate-cookbook-troubleshooting.md",
+      "sha256": "b36f9574cc4d5004f20ce7379b6dad26e77415b0eb06afb46e1dabf1a5968f86",
+      "state": "DIRTY",
+      "worktree_git_blob": "249c0b5a2555e74117d87bdc100418a082ee3537",
+      "worktree_state": "dirty"
+    },
+    {
+      "head_git_blob": "8a117ad79058550bd8c9f5055bb9980089f2edfd",
+      "path": "operations/boards/parking_lot_items/PL-0040_ESTATE_COOKBOOK_TROUBLESHOOTING.md",
+      "sha256": "c8a8ddcc9d466e7b6de55e70fe526e9c3fee84088a5244d1a76aa240336725f0",
+      "state": "DIRTY",
+      "worktree_git_blob": "ddfd265cb0a6b5507b4e28bab945e8c94414757f",
+      "worktree_state": "dirty"
+    }
+  ],
+  "changed_components": [
+    "estate_governed_population",
+    "estate_local_comprehension_worker"
+  ],
+  "changed_failure_modes": [
+    "bounded scans no longer mark assets outside the requested scope missing"
+  ],
+  "changed_files": [
+    "src/estate/core/estate_population.py",
+    "src/estate/core/estate_comprehension_worker.py",
+    "tests/test_estate_population.py",
+    "tests/test_estate_comprehension_worker.py",
+    "docs/operations/troubleshooting/benchmarks/PL-0040-LOCAL-AI-BENCHMARK-20260809.json",
+    "collaboration/parking_lot/PL-0040-estate-cookbook-troubleshooting.md",
+    "operations/boards/parking_lot_items/PL-0040_ESTATE_COOKBOOK_TROUBLESHOOTING.md"
+  ],
+  "changed_schemas": [],
+  "confidence": "CANDIDATE",
+  "dependencies_called": [
+    "Ollama /api/tags",
+    "Ollama /api/generate",
+    "knowledge-index scan/work-run/work-review/work-retry"
+  ],
+  "dependencies_read": [
+    "existing local comprehension worker",
+    "Ollama provider boundary",
+    "SQLite population/index and candidate lifecycle"
+  ],
+  "estate_change_id": "PL-0040-LOCAL-AI-QUALITY-BENCHMARK",
+  "expected_inputs": [
+    "real admitted benchmark assets",
+    "bounded local provider packets",
+    "existing SQLite work queue"
+  ],
+  "expected_outputs": [
+    "difficulty-stratified benchmark evidence",
+    "routing classification",
+    "controlled Level 1 candidate backlog run",
+    "review/retry evidence"
+  ],
+  "implementation_revision": "WORKTREE",
+  "new_failure_modes": [
+    "bounded-scan stale-state rejection",
+    "provider placeholder identity collision detected and preserved"
+  ],
+  "packet_version": "1.0.0",
+  "preliminary_troubleshooting_notes": [
+    "Stale packets must be rejected and followed by a narrow deterministic rescan; provider conflicts and timeouts remain review/retry evidence and must not be overwritten."
+  ],
+  "prohibited_recovery_actions": [
+    "Do not promote candidates, expand scope, browse outside packets, mutate files, schedule unattended inference, or perform GPU stress/reset operations."
+  ],
+  "recommended_checkpoint_impacts": [
+    "LD-RECONCILIATION",
+    "LD-DEVELOPER-INGESTION"
+  ],
+  "resources_written": [
+    "runtime/search/estate_knowledge_index.sqlite3",
+    "candidate interpretation and batch telemetry"
+  ],
+  "source_revision": "WORKTREE",
+  "tests_added_or_changed": [
+    "tests/test_estate_population.py",
+    "tests/test_estate_comprehension_worker.py"
+  ],
+  "validation_evidence": [
+    "67 focused regression tests before benchmark",
+    "13 focused tests after benchmark repairs",
+    "real qwen3-coder:30b benchmark across Level 1/2/3/4",
+    "3 accepted Level 1 backlog candidates after Estate-owned result-ID repair",
+    "full governed scan restored 5,832 admitted assets with zero missing/failed"
+  ],
+  "work_package_id": "PL-0040-LIVING-FOUNDATION"
+}
