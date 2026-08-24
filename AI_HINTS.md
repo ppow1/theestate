@@ -45,3 +45,15 @@ Read:
 Critical archived source:
 
 `archive/institutional_memory/Volume_01_Estate_Origins_Executive_Summary.md`
+
+
+
+## Stream Deck
+
+For Stream Deck profile, button, navigation, Riverview Operator, Quest Dev, or plugin work, read before modifying or diagnosing:
+
+- `docs/operations/stream_deck/STREAM_DECK_CURRENT_INVENTORY.md`
+- `docs/operations/stream_deck/STREAM_DECK_MAINTENANCE_AND_REPAIR_GUIDE.md`
+- `docs/operations/stream_deck/STREAM_DECK_CURRENT_INVENTORY.json`
+
+The installed Elgato StreamDeck configuration is runtime truth. Re-inventory it before changes if Pat has made manual edits.
