@@ -208,6 +208,25 @@ test("manifest, action list, and runtime registry expose the same actions", asyn
   );
 });
 
+test("Office controls use the repository-owned per-service runtime wrappers", async () => {
+  const office = ACTION_LIST.find((action) => action.key === "startOffice");
+  assert.ok(office);
+  assert.deepEqual(office.serviceIds, ["office"]);
+  assert.equal(office.commandPath, "A:\\theestate\\tools\\streamdeck\\estate-service-runtime\\Core\\Start-Office.cmd");
+  assert.equal(office.longPressCommandPath, "A:\\theestate\\tools\\streamdeck\\estate-service-runtime\\Core\\Stop-Office.cmd");
+  assert.equal(await fs.stat("A:\\theestate\\tools\\streamdeck\\estate-service-runtime\\Core\\Start-Office.ps1").then(() => true), true);
+  assert.equal(await fs.stat("A:\\theestate\\tools\\streamdeck\\estate-service-runtime\\Core\\Stop-Office.ps1").then(() => true), true);
+
+  const startScript = await fs.readFile("A:\\theestate\\tools\\streamdeck\\estate-service-runtime\\Core\\Start-Office.ps1", "utf8");
+  const stopScript = await fs.readFile("A:\\theestate\\tools\\streamdeck\\estate-service-runtime\\Core\\Stop-Office.ps1", "utf8");
+  assert.match(startScript, /Get-EstateService -ServiceId "office"/);
+  assert.match(startScript, /Start-EstateServiceProcess/);
+  assert.doesNotMatch(startScript, /Stop-All|RestartAll|Stop-EstateCore/);
+  assert.match(stopScript, /Get-EstateService -ServiceId "office"/);
+  assert.match(stopScript, /Stop-EstateServiceProcess/);
+  assert.doesNotMatch(stopScript, /Stop-All|RestartAll|Stop-EstateCore/);
+});
+
 test("runtime resolver recognizes the original six status actions and the newer control actions", () => {
   const originalSix = [
     "com.estate.statusbridge.estate",
@@ -418,4 +437,3 @@ test("git state summary maps required colors and compact values", () => {
   assert.deepEqual(summarizeGitState({ dirty: false, ahead: 2, behind: 0 }).value, "UP 2");
   assert.deepEqual(summarizeGitState({ dirty: false, ahead: 1, behind: 1 }).value, "DIV");
 });
-

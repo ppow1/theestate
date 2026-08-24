@@ -83,6 +83,47 @@ Critical invariant: ADB connected is not the same as mirror live. Mirror status 
 
 Quest Cast remains a deliberately bounded BLOCKED capability until a verified Meta casting automation mechanism is available. A clean Riverview BLOCKED result is different from a Stream Deck/plugin failure.
 
+## Estate four-service controls: CORE / RGW / OFFICE / WEBUI
+
+These four controls are service-scoped controls, not one aggregate start/restart surface.
+
+| Button | Action UUID | Service ownership | Current single-press command | Long press |
+|---|---|---|---|---|
+| CORE | `com.estate.statusbridge.surfaces.start` | `ollama`, `resident_gateway`, `open_webui` | `A:\\AI\\Tools\\EstateStreamDeckMVP\\Core\\Start-EstateCore.cmd` | none on this action |
+| RGW | `com.estate.statusbridge.resident_gateway.start` | `resident_gateway` | `A:\\AI\\Tools\\EstateStreamDeckMVP\\Core\\Start-ResidentGateway.cmd` | `Stop-ResidentGateway.cmd` |
+| OFFICE | `com.estate.statusbridge.office.start` | `office` only | `A:\\theestate\\tools\\streamdeck\\estate-service-runtime\\Core\\Start-Office.cmd` | `Stop-Office.cmd` in the same repository-owned runtime directory |
+| WEBUI | `com.estate.statusbridge.open_webui.start` | `open_webui` | `A:\\AI\\Tools\\EstateStreamDeckMVP\\Core\\Start-OpenWebUI.cmd` | `Stop-OpenWebUI.cmd` |
+
+The action definitions are maintained in `tools/streamdeck/estate-status-bridge/src/actions.js`; the installed action definitions are generated from that source. The four actions use `kind=serviceControl`, `operation=start`, and exact `serviceIds` shown above. The plugin classifies a short press as single when no double-press command is defined; a press held for approximately 1.25 seconds uses the configured long-press command. These semantics must not be inferred from button labels.
+
+The legitimate service boundary is:
+
+- CORE owns the three required Core services listed above.
+- RGW owns the Resident Gateway on `127.0.0.1:11435`.
+- OFFICE owns the Office of the Steward on `127.0.0.1:8765`.
+- WEBUI owns Open WebUI on `127.0.0.1:8080` (or its configured alternate port).
+
+OFFICE currently has no declared service dependency in the canonical runtime configuration. Its ensure operation must therefore inspect only `office`, start it if stopped, and leave healthy Core/RGW/WEBUI processes alone. The repository-owned `Start-Office.ps1` uses `Start-EstateServiceProcess`, including the per-service start mutex and owned-port checks. `Stop-Office.ps1` uses `Stop-EstateServiceProcess -AllOwnedInstances` for Office only; it does not call `Stop-All`, `Stop-EstateCore`, or `RestartAll`.
+
+### Incident evidence and repair
+
+Before this repair, OFFICE pointed to `A:\\AI\\Tools\\EstateStreamDeckMVP\\Core\\Start-Office.cmd`, which called the legacy `09-Start-Office.ps1` and the broad `Estate-Service-Control.ps1 -Action Office` controller. Static inspection of that controller shows that its `Office` branch calls its local `Start-Office` helper and does not explicitly call `Stop-All` or `RestartAll`; those operations are separate action branches. The retained Stream Deck diagnostics show long, overlapping governed-runtime status probes, including `READY`, `PORT_OCCUPIED`, and timeout samples, but do not contain a durable Office command-execution record proving that the Office branch killed Core. Therefore the exact historical Core teardown cannot be certified from retained evidence as direct Office process churn; the visible extended state changes were at least partly status/probe churn, and any unretained process churn is unproven.
+
+The bounded repair removes the unsafe legacy seam from the OFFICE button: its start and long-press stop now target the repository-owned per-service wrappers above. This provides an idempotent Office-only mutex/ownership boundary and prevents a healthy Core/RGW/WEBUI service from being stopped merely because Office is being ensured. The canonical runtime source files had three captured shell-output lines at their beginnings; those lines were removed because they made the shared library unparsable when the new wrapper loaded it.
+
+### Non-destructive validation performed
+
+With Core/RGW/WEBUI healthy, the new Office start wrapper returned `already_running` without changing Office or any other service. A bounded Office-only stop/start test recorded these unaffected listener PIDs before and after:
+
+- Ollama / Core, port 11434: PID `21520` before and after.
+- Resident Gateway / RGW, port 11435: PID `42340` before and after.
+- Open WebUI / WEBUI, port 8080: PID `30504` before and after.
+- Office was stopped and then restarted independently; its new listener PID was `51120`.
+
+After restart, `http://127.0.0.1:11435/v1/models`, `http://127.0.0.1:8765/`, and `http://127.0.0.1:8080/` all returned HTTP 200. The four key colors are computed from the exact `serviceIds` and governed status probe: green only when every owned target is healthy, yellow for partial/degraded state, and red when no owned target is healthy. OFFICE is not green merely because Core is healthy.
+
+Do not use the old Office controller for future repairs. Before a physical test, verify the installed plugin contains the new `actions.js` path, then test the physical OFFICE press while recording listener PIDs. A successful physical acceptance still requires Pat to confirm that starting Office leaves healthy Core/RGW/WEBUI running and that the Office website refreshes.
+
 ## Backups and diagnostics
 
 Back up the complete installed Stream Deck tree before direct modification. The established backup location is `C:\\Users\\wille\\AppData\\Roaming\\Elgato\\StreamDeck-Backups`. Preserve the Estate profile and unrelated profiles/plugins. Keep repository-side repair/configuration separate from machine-local generated state.

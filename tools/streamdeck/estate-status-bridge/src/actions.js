@@ -1,10 +1,15 @@
 export const PLUGIN_UUID = "com.estate.statusbridge";
 
 const MVP_ROOT = "A:\\AI\\Tools\\EstateStreamDeckMVP";
+const ESTATE_RUNTIME_ROOT = "A:\\theestate\\tools\\streamdeck\\estate-service-runtime";
 const CORE_SERVICE_IDS = ["ollama", "resident_gateway", "open_webui"];
 
 function mvpCommand(fileName) {
   return `${MVP_ROOT}\\${fileName}`;
+}
+
+function estateRuntimeCommand(fileName) {
+  return `${ESTATE_RUNTIME_ROOT}\\${fileName}`;
 }
 
 export const ACTION_LIST = [
@@ -152,8 +157,8 @@ export const ACTION_LIST = [
     operation: "start",
     value: "START",
     serviceIds: ["office"],
-    commandPath: mvpCommand("Core\\Start-Office.cmd"),
-    longPressCommandPath: mvpCommand("Core\\Stop-Office.cmd"),
+    commandPath: estateRuntimeCommand("Core\\Start-Office.cmd"),
+    longPressCommandPath: estateRuntimeCommand("Core\\Stop-Office.cmd"),
     icon: "images/health",
     profilePosition: [2, 1]
   },

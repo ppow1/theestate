@@ -1,6 +1,3 @@
-Exit code: 0
-Wall time: 0.5 seconds
-Output:
 $script:EstateCoreServiceConfig = @{
     EstateRoot = "A:\theestate"
     PythonPath = "A:\theestate\src"
@@ -231,5 +228,4 @@ $script:EstateCoreServiceConfig = @{
 function Get-EstateServiceConfig {
     return $script:EstateCoreServiceConfig
 }
-
 

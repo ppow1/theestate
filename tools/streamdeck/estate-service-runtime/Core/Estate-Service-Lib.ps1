@@ -1,6 +1,3 @@
-Exit code: 0
-Wall time: 0.5 seconds
-Output:
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
@@ -838,7 +835,6 @@ function Restart-EstateCore {
         health = Get-EstateCoreHealthData
     }
 }
-
 
 
 

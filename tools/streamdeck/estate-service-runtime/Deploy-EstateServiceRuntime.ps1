@@ -12,7 +12,11 @@ $files = @(
     "Start-EstateCore.ps1",
     "Start-OpenWebUI.ps1",
     "Start-ResidentGateway.ps1",
+    "Start-Office.ps1",
+    "Start-Office.cmd",
     "Stop-EstateCore.ps1",
+    "Stop-Office.ps1",
+    "Stop-Office.cmd",
     "Restart-EstateCore.ps1"
 )
 
