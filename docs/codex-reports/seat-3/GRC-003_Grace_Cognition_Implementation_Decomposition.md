@@ -139,8 +139,8 @@ Execution layer:
 
 - GRC-003-E1 depends on F1, F3, P1, and P2: home cognition path
 - GRC-003-E2 depends on F1, F2, F4, P1, and P2: high-reasoning request path
-- GRC-003-E3 depends on E2 and P2: external advisory path
-- GRC-003-E4 depends on E2 and E3: result return and Grace integration
+- GRC-003-E3 depends on F1, F2, F4, P1, and P2: external advisory path
+- GRC-003-E4 depends on E2 and E3 result contracts: result return and Grace integration
 - GRC-003-E5 depends on E4 and existing consultation seams: continuations
 
 Operational integration:
@@ -161,7 +161,10 @@ Acceptance:
 
 The following can be assigned concurrently with non-overlapping ownership:
 
-- F1, F2, F3, and F4, provided each package owns separate files/contracts.
+- F1, F2, and F3 may be prepared concurrently when each package owns separate
+  files/contracts. F4 is a dependent package: non-dependent scaffolding may
+  proceed in parallel, but F4 implementation must not be accepted or built
+  against an unfrozen F1 contract.
 - P1 and P2 after F1; P1 owns policy files and P2 owns binding/resource files.
 - E1 and E2 after their stated dependencies if the shared result envelope is
   frozen by F1 and both avoid editing the same runtime module concurrently.
@@ -566,7 +569,9 @@ provider fallback, and no execution.
 Objective: allow approved provider-neutral external cognitive advice when
 policy permits, without granting authority or bypassing normal paths.
 
-Dependencies: E2 contract shapes, F1, F2, F4, and P2.
+Dependencies: accepted F1, F2, F4, P1, and P2 contracts. E2 and E3 are
+parallel alternate execution paths; completed E2 runtime implementation is not
+a prerequisite. E3 may reuse the common result-envelope shapes.
 
 Files/symbols expected to be touched: bounded external adapter module;
 existing CognitiveEscalationRuntime or GraceConsultationLoop adapter; external
@@ -604,7 +609,8 @@ credential provisioning, no automatic fallback, and no execution.
 Objective: return high/external advice to the same Grace occupant and resume
 home operational coordination without silent execution.
 
-Dependencies: E2 and E3; F3 and F4.
+Dependencies: accepted E2 and E3 result forms; F3 and F4. E2 and E3 are
+alternate paths and neither operational path is required to precede the other.
 
 Files/symbols expected to be touched: result integration module; Grace response
 boundary adapter; provenance/event tests; no Campaign Runner files.
@@ -815,7 +821,7 @@ configuration input, request IDs, timeout, evidence output, and cleanup.
 Database/persistence impact: live event/evidence records only; no migration or
 assignment change.
 
-Tests/scenarios required: routine home generation; difficult high request;
+Tests required: routine home generation; difficult high request;
 pointless escalation with no high invocation; high unavailable/busy/timeout;
 malformed output; result return; provider/resource provenance; no execution.
 
@@ -852,7 +858,7 @@ timeline/reconciliation report.
 
 Database/persistence impact: live test evidence and cleanup; no schema change.
 
-Tests/scenarios required: concurrent Grace/other-resident home requests;
+Tests required: concurrent Grace/other-resident home requests;
 Grace high request while other resident remains responsive; capacity hold and
 release; stale owner recovery; no cross-resident packet/result; latency and
 queue evidence; deterministic mechanics remain non-cognitive.
