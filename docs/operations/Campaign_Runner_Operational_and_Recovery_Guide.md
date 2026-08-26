@@ -72,9 +72,13 @@ validator/revalidator attempts.
 
 ## 5. Git and worktree policy
 
-Riverview implementation belongs on `main`. Do not routinely create feature
+Riverview implementation authority is `ppow1/Riverview main`. Canonical Estate
+documentation authority is `ppow1/theestate main`. A non-main checkout fails
+the normal operator/startup expectation unless the current work package
+explicitly authorizes that exact branch. Do not routinely create feature
 branches. Historical `codex/c484-operator-persistent-service` is evidence only
-and must not be reused for development.
+and must not be reused for development. The existence of a historical branch
+does not authorize it or imply that its contents are absent from `main`.
 
 Use one bounded package worktree across internal repairs; a separate Git
 commit is not required for each defect. Create one coherent candidate only

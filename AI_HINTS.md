@@ -66,6 +66,16 @@ It covers package-level self-repair, PostgreSQL durable state, independent
 acceptance at the package boundary, main-only Riverview development,
 restart/resume, and validator ownership fencing.
 
+### Repository branch authority
+
+**Default authority is `main`. Existing branches are not authorization.**
+Before modifying a repository, verify that the work package explicitly
+authorizes the current branch. If it does not name another branch, use `main`.
+
+Read:
+
+`docs/operations/Repository_Branch_Authority.md`
+
 ### Using multiple AI coding workers or independent adversarial review?
 
 Read before coordinating multiple Codex seats, local coding models, Hermes
