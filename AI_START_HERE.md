@@ -11,5 +11,8 @@ Read in this order:
 5. docs/governance/Practical_Worker_Onboarding_Addendum.md
 6. docs/governance/PowerShell_Session_Output_and_Handoff_Standard.md
 7. docs/governance/visuals/README.md
+8. docs/operations/Campaign_Runner_Operational_and_Recovery_Guide.md when
+   launching, resuming, debugging, or changing Campaign Runner or a governed
+   development package.
 
 Local repo state is source of truth
