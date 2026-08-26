@@ -55,6 +55,17 @@ Read:
 
 `AI_START_HERE.md`
 
+### Working with Campaign Runner or governed development packages?
+
+Read before launching, resuming, repairing, debugging, or changing Campaign
+Runner, or before using it to implement a governed package:
+
+`docs/operations/Campaign_Runner_Operational_and_Recovery_Guide.md`
+
+It covers package-level self-repair, PostgreSQL durable state, independent
+acceptance at the package boundary, main-only Riverview development,
+restart/resume, and validator ownership fencing.
+
 ## Guardrails
 
 - Do not redesign the Estate merely because context was lost.
