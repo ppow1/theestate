@@ -46,6 +46,13 @@ It covers package-level self-repair, PostgreSQL durable state, independent
 acceptance at the package boundary, main-only Riverview development,
 restart/resume, and validator ownership fencing.
 
+### Using multiple AI coding workers or independent adversarial review?
+
+Read before coordinating multiple Codex seats, local coding models, Hermes
+workers, or mixed AI engineering roles:
+
+`docs/operations/Multi_Seat_Adversarial_AI_Engineering_Method.md`
+
 ## Guardrails
 
 - Do not redesign the Estate merely because context was lost.

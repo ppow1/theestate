@@ -198,6 +198,10 @@ defects are also required. FAIL preserves the complete structured defect set
 and returns repair ownership. Revalidation must evaluate the repaired
 candidate, not an older result.
 
+For the broader manual rationale, rotating three-seat fallback, and
+provider-neutral adversarial-review method, see the [Multi-Seat Adversarial AI
+Engineering Method](Multi_Seat_Adversarial_AI_Engineering_Method.md).
+
 ## 12. PowerShell and Python entrypoints
 
 Current operator script:
