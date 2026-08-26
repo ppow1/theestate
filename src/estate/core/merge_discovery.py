@@ -12,6 +12,7 @@ from estate.core.operational_targets_runtime import OperationalTargetRuntime
 from estate.core.operational_target_resolution import OperationalTargetResolver
 from estate.core.merge_discovery_consolidation import MergeDiscoveryConsolidator
 from estate.core.paths import ESTATE_ROOT
+from estate.core.runtime_recovery import _atomic_write_json
 
 BASE = Path("runtime/merge_discovery")
 TARGETS = BASE / "targets"
@@ -23,7 +24,7 @@ FINAL_VERDICTS = {"accepted", "accepted_with_notes", "ring2_required", "needs_re
 
 def utc_now_iso(): return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 def _root(root=None): return Path(root) if root is not None else (ESTATE_ROOT if ESTATE_ROOT.exists() else Path.cwd())
-def _write(p:Path, d:Any): p.parent.mkdir(parents=True, exist_ok=True); p.write_text(json.dumps(d, indent=2, sort_keys=True)+"\n", encoding="utf-8")
+def _write(p:Path, d:Any): _atomic_write_json(p, d)
 def _read(p:Path): return json.loads(p.read_text(encoding="utf-8"))
 def _rel(p:Path, root:Path):
     try: return str(p.relative_to(root)).replace('\\','/')

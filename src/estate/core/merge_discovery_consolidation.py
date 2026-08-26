@@ -9,6 +9,7 @@ from typing import Any
 from uuid import uuid4
 
 from estate.core.post_merge_audit import PostMergeAuditRequest
+from estate.core.runtime_recovery import _atomic_write_json
 
 BASE = Path("runtime/merge_discovery")
 DISCOVERIES = BASE / "discoveries"
@@ -44,8 +45,7 @@ def utc_now_iso() -> str:
 
 
 def _write(path: Path, payload: Any) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    _atomic_write_json(path, payload)
 
 
 def _read(path: Path) -> Any:

@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import json
+import hashlib
+import shutil
 from pathlib import Path
 from typing import Any
 
@@ -11,6 +13,7 @@ from estate.core.operational_target_validation_binding import OperationalTargetV
 from estate.core.paths import ESTATE_ROOT
 from estate.core.post_merge_validation_pipeline import PipelineConfig, PostMergeValidationPipeline, utc_now_iso
 from estate.core.post_merge_audit_lifecycle import FINAL_VERDICTS
+from estate.core.post_merge_audit_runtime import _write
 
 BASE = Path("runtime/post_merge_audit")
 REQUESTS = BASE / "requests"
@@ -22,8 +25,7 @@ def _root(root: Path | None = None) -> Path:
 
 
 def _write_json(path: Path, payload: Any) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    _write(path, payload)
 
 
 def _read_json(path: Path) -> Any:
@@ -46,9 +48,66 @@ class PostMergeAuditProcessor:
         if not self.request_dir.exists(): return []
         out = []
         for p in sorted(self.request_dir.glob("*.json")):
-            d = _read_json(p); d.setdefault("state", d.get("status", "pending")); d["request_path"] = str(p)
+            try:
+                d = _read_json(p)
+            except (json.JSONDecodeError, UnicodeDecodeError) as exc:
+                self.quarantine_request(p, error=exc)
+                continue
+            d.setdefault("state", d.get("status", "pending")); d["request_path"] = str(p)
             if state is None or d.get("state") == state: out.append(d)
         return out
+
+    @property
+    def quarantine_dir(self) -> Path:
+        return self.root / BASE / "quarantine"
+
+    @property
+    def recovery_dir(self) -> Path:
+        return self.root / BASE / "recovery"
+
+    def quarantine_request(self, path: Path | str, *, error: Exception | None = None) -> dict[str, Any]:
+        """Preserve and remove one malformed generated request from discovery."""
+        source = Path(path)
+        if not source.is_absolute():
+            source = self.root / source
+        source = source.resolve()
+        request_dir = self.request_dir.resolve()
+        if source.parent != request_dir or source.suffix.lower() != ".json":
+            raise ValueError("quarantine target must be a JSON file directly under the post-merge request directory")
+        raw = source.read_bytes()
+        try:
+            json.loads(raw.decode("utf-8"))
+        except (json.JSONDecodeError, UnicodeDecodeError) as parse_error:
+            error = error or parse_error
+        else:
+            raise ValueError(f"request is valid JSON and cannot be quarantined: {source}")
+        digest = hashlib.sha256(raw).hexdigest()
+        corruption_type = "nul_filled" if raw and set(raw) == {0} else "malformed_json"
+        destination = self.quarantine_dir / source.name
+        receipt_path = self.recovery_dir / f"{source.stem}.json"
+        self.quarantine_dir.mkdir(parents=True, exist_ok=True)
+        self.recovery_dir.mkdir(parents=True, exist_ok=True)
+        if destination.exists():
+            if hashlib.sha256(destination.read_bytes()).hexdigest() != digest:
+                raise OSError(f"quarantine destination already contains different evidence: {destination}")
+            source.unlink()
+        else:
+            shutil.move(str(source), str(destination))
+        receipt = {
+            "schema_version": "post_merge_audit_corrupt_request_recovery.v1",
+            "recovery": "quarantined_corrupt_generated_request",
+            "original_path": str(source),
+            "original_byte_count": len(raw),
+            "original_sha256": digest,
+            "corruption_type": corruption_type,
+            "parse_error": str(error),
+            "quarantine_path": str(destination),
+            "executable_request_discovery": "excluded",
+            "preserved_original_bytes": True,
+            "recovered_at": utc_now_iso(),
+        }
+        _write_json(receipt_path, receipt)
+        return {**receipt, "recovery_receipt": str(receipt_path)}
 
     def claim_next(self) -> dict[str, Any] | None:
         pending = self.list_requests("pending")
@@ -143,7 +202,8 @@ class PostMergeAuditProcessor:
         running = next((r for r in reqs if r.get("state") in {"claimed","running_validation","running_ring2"}), None)
         latest_resolution = (latest or {}).get("latest_target_resolution") or ((latest or {}).get("metadata") or {}).get("target_resolution")
         latest_binding = (latest or {}).get("target_binding_status") or {}
-        return {"automatic_validation_available": True, "pending_audit_requests": sum(1 for r in reqs if r.get("state") == "pending"), "running_audit_request": running, "latest_completed_audit": latest, "latest_validation_status": (latest or {}).get("validation_result"), "latest_production_ready": (latest or {}).get("production_ready"), "latest_ring2_status": ((latest or {}).get("ring2_paths") or {}).get("prompt"), "latest_verdict": (latest or {}).get("verdict"), "latest_verdict_artifact": (latest or {}).get("verdict_path"), "validation_workspace_health": "configured", "validation_evidence_root": str(self.pipeline.config.resolved_evidence_root()), "provider_execution_performed": False, "dispatch_execution_performed": False, "latest_target_resolution": latest_resolution, "latest_target_resolution_status": (latest_resolution or {}).get("resolution_method"), "latest_target_resolution_method": (latest_resolution or {}).get("resolution_method"), "latest_target_binding_ready": latest_binding.get("ready"), "latest_target_binding_gaps": latest_binding.get("missing_requirements", []), "unresolved_target_requests": sum(1 for r in reqs if ((r.get("latest_target_resolution") or {}).get("resolution_method") == "not_found")), "ambiguous_target_requests": sum(1 for r in reqs if ((r.get("latest_target_resolution") or {}).get("resolution_method") == "ambiguous"))}
+        quarantined = sorted(self.quarantine_dir.glob("*.json")) if self.quarantine_dir.exists() else []
+        return {"automatic_validation_available": True, "pending_audit_requests": sum(1 for r in reqs if r.get("state") == "pending"), "running_audit_request": running, "latest_completed_audit": latest, "latest_validation_status": (latest or {}).get("validation_result"), "latest_production_ready": (latest or {}).get("production_ready"), "latest_ring2_status": ((latest or {}).get("ring2_paths") or {}).get("prompt"), "latest_verdict": (latest or {}).get("verdict"), "latest_verdict_artifact": (latest or {}).get("verdict_path"), "validation_workspace_health": "configured", "validation_evidence_root": str(self.pipeline.config.resolved_evidence_root()), "provider_execution_performed": False, "dispatch_execution_performed": False, "latest_target_resolution": latest_resolution, "latest_target_resolution_status": (latest_resolution or {}).get("resolution_method"), "latest_target_resolution_method": (latest_resolution or {}).get("resolution_method"), "latest_target_binding_ready": latest_binding.get("ready"), "latest_target_binding_gaps": latest_binding.get("missing_requirements", []), "unresolved_target_requests": sum(1 for r in reqs if ((r.get("latest_target_resolution") or {}).get("resolution_method") == "not_found")), "ambiguous_target_requests": sum(1 for r in reqs if ((r.get("latest_target_resolution") or {}).get("resolution_method") == "ambiguous")), "quarantined_corrupt_request_count": len(quarantined)}
 
     def _write_status(self, payload: dict[str, Any]) -> None:
         status = {"generated_at": utc_now_iso(), "latest_result": payload, "summary": self.summary()}

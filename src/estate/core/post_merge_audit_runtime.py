@@ -8,9 +8,10 @@ from estate.core.post_merge_audit import PostMergeAuditRequest, PostMergeAuditVe
 from estate.core.operational_targets_runtime import OperationalTargetRuntime
 from estate.core.work_package_validation import validate_work_package
 from estate.core.production_readiness_validation import validate_receipt, calculate_production_readiness
+from estate.core.runtime_recovery import _atomic_write_json
 BASE=Path('runtime/post_merge_audit')
 def _root(root=None): return Path(root) if root is not None else (ESTATE_ROOT if ESTATE_ROOT.exists() else Path.cwd())
-def _write(path:Path,payload:Any): path.parent.mkdir(parents=True,exist_ok=True); path.write_text(json.dumps(payload,indent=2,sort_keys=True)+'\n',encoding='utf-8')
+def _write(path:Path,payload:Any): _atomic_write_json(path, payload)
 def _rel(p:Path,r:Path):
     try: return str(p.relative_to(r)).replace('\\','/')
     except ValueError: return str(p).replace('\\','/')

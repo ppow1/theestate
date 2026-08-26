@@ -614,6 +614,8 @@ def cmd_post_merge_audit(args):
         payload = processor.demonstrate(args.work_package, pr=args.pr)
     elif action == "status":
         payload = processor.summary()
+    elif action == "quarantine":
+        payload = processor.quarantine_request(args.request)
     else:
         raise SystemExit(1)
     print(json.dumps(payload, indent=2, sort_keys=True) if getattr(args, "json", False) else json.dumps(payload, indent=2, sort_keys=True))
@@ -4115,6 +4117,10 @@ def main(argv=None):
     q.add_argument("--json", action="store_true")
     q.set_defaults(func=cmd_post_merge_audit)
     q = pma.add_parser("status", help="Show post-merge audit processor status")
+    q.add_argument("--json", action="store_true")
+    q.set_defaults(func=cmd_post_merge_audit)
+    q = pma.add_parser("quarantine", help="Quarantine one malformed generated request with evidence")
+    q.add_argument("request", help="Request filename or path under runtime/post_merge_audit/requests")
     q.add_argument("--json", action="store_true")
     q.set_defaults(func=cmd_post_merge_audit)
 
