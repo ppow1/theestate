@@ -2,10 +2,14 @@
 
 The isolated proof in `experiments/engineering_notebook_001/` uses a fixed
 Markdown corpus and three stages: parser output, schema output, and populated
-HTML. Each stage is executed by a new bounded `WorkerSession` that receives only
-the verified packet and current-stage files. The prior transcript is not passed.
+HTML. Each stage is executed by a separate Python process that receives only a
+serialized verified packet, current-stage files, and current validation context.
+No prior transcript or in-memory state is passed.
 
-After each stage the harness updates task/evidence/continuity facts and records
-the next stage. A changed fixture digest is detected as `conflicted`, and the
-execution gate rejects it. The proof is intentionally a deterministic worker
-protocol test, not a claim that a coding model was onboarded or accepted.
+After each stage the harness atomically writes a revisioned state and receipt.
+Session 2 creates a handoff; a deliberately conflicted state is rejected,
+refreshed from authoritative facts, and session 3 resumes from the refreshed
+handoff. The proof records process IDs, packet/state digests, acknowledgments,
+actions, validation, proposals, receipts, handoffs, and fixture hashes. The
+result is precisely **HARNESS-LEVEL FRESH-SESSION CONTINUITY**, not local-model
+acceptance, resident integration, or institutional acceptance.

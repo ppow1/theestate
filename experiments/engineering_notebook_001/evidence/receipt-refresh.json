@@ -1,0 +1,31 @@
+{
+  "schema_version": "estate.engineering-notebook.verification-receipt.v1",
+  "receipt_id": "receipt-refresh-authoritative",
+  "proposal_id": "refresh-authoritative",
+  "notebook_id": "poc-001",
+  "status": "accepted",
+  "accepted_at": "2026-08-02T20:34:36Z",
+  "accepted_fields": [
+    "freshness",
+    "status"
+  ],
+  "rejected_fields": [],
+  "observed_facts": {
+    "reason": "authoritative freshness refresh"
+  },
+  "state_digest": "5ee2372cde0c49b4c0d75773c17f97b40c7d4b095e8a6df0502f24b1edc995f1",
+  "institutional_acceptance": "not_granted",
+  "revision": 3,
+  "idempotency_key": "idem-refresh",
+  "prior_state_digest": "bd114f326ef9f4d57288ac3db9e8be55346ef61e78f300336dbb6631b7de8f5f",
+  "resulting_state_digest": "5ee2372cde0c49b4c0d75773c17f97b40c7d4b095e8a6df0502f24b1edc995f1",
+  "provenance": [
+    {
+      "source": "authoritative-refresh",
+      "category": "repository_derived",
+      "digest": "e7c17b22c212736febc22d3dc82fba16078dd03679987113d7c0023eb50bb28d",
+      "observed_at": "2026-08-02T20:34:36Z",
+      "claim": "authoritative freshness refresh"
+    }
+  ]
+}

@@ -4,17 +4,23 @@
   "proposal_id": "stage-schema",
   "notebook_id": "poc-001",
   "status": "accepted",
-  "accepted_at": "2026-08-02T11:14:47Z",
+  "accepted_at": "2026-08-02T20:34:35Z",
   "accepted_fields": [
-    "continuity",
-    "evidence",
-    "task"
+    "continuity.compaction_summary",
+    "continuity.next_stage_files",
+    "continuity.previous_session",
+    "evidence.files",
+    "evidence.last_results",
+    "evidence.receipts",
+    "task.completed_stages",
+    "task.current_stage",
+    "task.remaining_stages"
   ],
   "rejected_fields": [],
   "observed_facts": {
     "task": {
       "original_objective": "Complete parser, schema, and HTML stages from verified notebook state.",
-      "current_stage": "schema",
+      "current_stage": "html",
       "stage_status": "active",
       "completed_stages": [
         "parser",
@@ -66,8 +72,8 @@
     },
     "continuity": {
       "previous_session": "worker-2",
-      "handoff_reason": "fresh-session stage handoff",
-      "compaction_summary": "Completed schema; carry only verified output and next stage.",
+      "handoff_reason": "fresh process session handoff",
+      "compaction_summary": "Completed schema; carry only verified packet and current stage.",
       "safe_facts": [
         "Notebook is subordinate to authoritative repository and runtime records."
       ],
@@ -80,8 +86,23 @@
         "workspace/workspace/validated.json"
       ],
       "expires_at": null
-    }
+    },
+    "artifacts_exist": true,
+    "required_validators_passed": true
   },
-  "state_digest": "c040180ddf86a4e186aabc56f0e6d7d9bf49f1dcfc95aeb7814e9a4d934e7623",
-  "institutional_acceptance": "not_granted"
+  "state_digest": "ab574f3b80c199f8c93000f6b468dd20a57f746f61e9344d7584dcc819522147",
+  "institutional_acceptance": "not_granted",
+  "revision": 2,
+  "idempotency_key": "idem-stage-schema",
+  "prior_state_digest": "8140fe3e69a8aeccf3eaf56904fd598eab261c1c682a96a28c2c530d8abf608f",
+  "resulting_state_digest": "ab574f3b80c199f8c93000f6b468dd20a57f746f61e9344d7584dcc819522147",
+  "provenance": [
+    {
+      "source": "poc_runner.py",
+      "category": "validator_produced",
+      "digest": null,
+      "observed_at": "2026-08-02T20:34:35Z",
+      "claim": "Independent process validated the schema stage."
+    }
+  ]
 }
