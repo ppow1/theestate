@@ -18,6 +18,7 @@ from typing import Any
 
 from estate.core.operations_runtime import utc_now_iso
 from estate.core.operations_runtime_service import OperationsRuntimeLockError, OperationsRuntimeService
+from estate.core.background_process import hidden_background_popen_kwargs
 from estate.core.paths import ESTATE_ROOT
 
 HOST_ENV = "ESTATE_OPERATIONS_RUNTIME_HOST_DIR"
@@ -216,7 +217,7 @@ class OperationsRuntimeHost:
         env[HOST_ENV] = str(self.state_dir)
         cmd = [sys.executable, "-m", "estate.cli.main", "operations-runtime", "host", "run-foreground"]
         with (self.state_dir / "host.stdout.log").open("ab") as out, (self.state_dir / "host.stderr.log").open("ab") as err:
-            proc = subprocess.Popen(cmd, cwd=str(self.root), env=env, stdin=subprocess.DEVNULL, stdout=out, stderr=err, start_new_session=(os.name != "nt"))
+            proc = subprocess.Popen(cmd, cwd=str(self.root), env=env, stdin=subprocess.DEVNULL, stdout=out, stderr=err, **hidden_background_popen_kwargs())
         payload = {"state": "starting", "pid": proc.pid, "command": cmd, "started_at": utc_now_iso(), "heartbeat_at": utc_now_iso(), "state_dir": str(self.state_dir), "root": str(self.root)}
         _write_json(self.pid_path, payload)
         _write_json(self.lock_path, payload)
@@ -316,7 +317,7 @@ class OperationsRuntimeHost:
         payload = {"installed_at": utc_now_iso(), "installed": True, "method": "scheduled-task" if os.name == "nt" else "manual-launch-manifest", "command": command, "root": str(self.root), "state_dir": str(self.state_dir), "scheduled_task_name": self.task_name, "scheduled_task_exists": False, "scheduled_task_verified": False}
         if os.name == "nt":
             launcher = self._write_windows_launcher()
-            task_command = f'powershell.exe -NoProfile -ExecutionPolicy Bypass -File "{launcher}"'
+            task_command = f'powershell.exe -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File "{launcher}"'
             create_cmd = ["schtasks", "/Create", "/SC", "ONLOGON", "/TN", self.task_name, "/TR", task_command, "/F"]
             result = _run_command(create_cmd)
             if result.returncode != 0:
