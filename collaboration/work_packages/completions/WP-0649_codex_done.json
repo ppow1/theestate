@@ -1,0 +1,38 @@
+{
+  "work_package_id": "WP-0649",
+  "implemented_at": "2026-07-12",
+  "implementation_status": "implemented_pending_execution_validation",
+  "root_cause": "WP-0618 configured pytest --basetemp beneath a repository-local Temp parent that was absent in clean isolated worktrees.",
+  "files_added": [
+    "Temp/.gitkeep",
+    "tests/test_wp0649_validation_basetemp.py",
+    "collaboration/work_packages/pending/WP-0649_Repair_Isolated_Validation_Basetemp_Preparation_and_Revalidate_WP-0618.md",
+    "collaboration/work_packages/completions/WP-0649_codex_done.json"
+  ],
+  "validation_engine_modified": false,
+  "runtime_host_modified": false,
+  "runtime_synchronization_modified": false,
+  "provider_execution_performed": false,
+  "dispatch_execution_performed": false,
+  "institutional_acceptance_granted": false,
+  "regression_test_added": true,
+  "clean_worktree_temp_parent_tracked": true,
+  "required_validation_commands": [
+    "python -m py_compile src/estate/core/work_package_validation.py",
+    "pytest -q tests/test_wp0649_validation_basetemp.py",
+    "pytest -q tests/test_operational_targets.py tests/test_operational_targets_runtime.py tests/test_post_merge_audit.py tests/test_post_merge_audit_runtime.py --basetemp Temp/pytest-operational-targets-post-merge-audit",
+    "python -m estate.cli.main validate-work-package --id WP-0618 --json"
+  ],
+  "validation_executed_in_connector_environment": false,
+  "validation_limitation": "The GitHub connector can write and review repository artifacts but cannot execute the Windows-local Estate test suite. Required commands must run in a synchronized local checkout or CI before approval.",
+  "ready_for_merge": false,
+  "local_validation_executed": true,
+  "wp0649_regression_passed": true,
+  "wp0618_focused_suite_passed": true,
+  "wp0618_governed_validation_passed": true,
+  "wp0618_resulting_verdict": "passed",
+  "validation_completed_at": "2026-07-12T04:45:15.0748101Z",
+  "validated_branch": "agent/wp-0649-validation-basetemp",
+  "validated_commit": "1f18469dad4ba537450cc9889a5f7caa4780f698",
+  "ready_for_ca_review": true
+}
