@@ -1,5 +1,7 @@
+import json
+
 from estate.core.execution_adapter_handoff_runtime import prepare_handoff
-from estate.core.openwebui_engineering_workflow import detect_engineering_assignment_command, detect_bounded_local_text_intent, detect_bounded_compute_resource_intent, _qwen_minimum_safe_vram_mib, _target_symbolic_lane
+from estate.core.openwebui_engineering_workflow import bounded_trace_id, record_bounded_parallel_trace, detect_engineering_assignment_command, detect_bounded_local_text_intent, detect_bounded_compute_resource_intent, _qwen_minimum_safe_vram_mib, _target_symbolic_lane, _target_registered_lane, _parallel_bounded_text_task_specs, execute_parallel_bounded_local_text_from_chat
 from estate.core.resident_gateway import _bounded_local_text_content, _grace_runtime_operation_response
 from estate.core import resident_gateway
 from estate.core.resident_gateway import chat_completion, chat_completion_stream
@@ -24,6 +26,103 @@ def test_bounded_text_intent_is_explicit_and_ordinary_chat_is_not_executable():
     assert detect_bounded_local_text_intent({"model": "estate/grace"}, LIVE_BOUNDED_PROMPT) == {"state": "execution_requested", "intent": "bounded_local_text", "source": "explicit_chat_prefix"}
     assert detect_bounded_local_text_intent({"model": "estate/grace"}, "Grace, what is the Estate status?")["state"] == "conversation_only"
     assert detect_bounded_local_text_intent({"model": "estate/grace"}, "Grace, run something locally.")["state"] == "execution_blocked"
+
+
+def test_natural_bounded_local_text_variants_are_executable():
+    prompts = [
+        "Run one small governed local text task and return one short sentence confirming successful local execution. Use the normal governed execution path and do not perform hardware actions.",
+        "Grace, execute a bounded local text-generation task and give me one short sentence.",
+        "Use the governed local text execution path for a tiny response.",
+        "Run a small local governed text task; no hardware actions.",
+    ]
+    for prompt in prompts:
+        result = detect_bounded_local_text_intent({"model": "estate/grace"}, prompt)
+        assert result == {"state": "execution_requested", "intent": "bounded_local_text", "source": "semantic_chat_intent"}
+
+
+def test_ambiguous_or_unsafe_local_requests_remain_fail_closed():
+    prompts = [
+        "Run this locally.",
+        "Use my GPU.",
+        "Execute something on this computer.",
+        "Run a benchmark.",
+        "Delete this file locally.",
+        "Launch PowerShell locally.",
+    ]
+    for prompt in prompts:
+        assert detect_bounded_local_text_intent({"model": "estate/grace"}, prompt)["state"] == "execution_blocked"
+
+
+def test_natural_parallel_bounded_text_variants_produce_two_qualified_specs():
+    prompts = [
+        "Grace, run two small independent governed local text tasks at the same time: one on the governed RTX 4090 lane and one on the conservative P100 lane. Keep both tasks tiny and return one short result from each.",
+        "Run two bounded local text-generation tasks concurrently, one on each qualified GPU lane.",
+        "Execute a pair of small governed text tasks in parallel: one on 4090 and one on P100.",
+        "Run two independent governed local text tasks concurrently and return a short result from each.",
+    ]
+    for prompt in prompts:
+        result = detect_bounded_local_text_intent({"model": "estate/grace"}, prompt)
+        assert result["state"] == "execution_requested"
+        assert result["intent"] == "parallel_bounded_local_text"
+        assert len(result["task_specs"]) == 2
+        assert [item["runtime_lane_id"] for item in result["task_specs"]] == ["qwen.local.text.4090", "qwen.local.text.p100-1"]
+
+
+def test_parallel_intent_preserves_qualified_profiles_and_fails_closed_for_unsafe_requests():
+    specs = _parallel_bounded_text_task_specs()
+    assert specs[0]["model"] == "qwen3:8b" and specs[0]["concurrency"] == 1
+    assert specs[1]["model"] == "llama3.2:3b" and specs[1]["context_limit"] == 1024 and specs[1]["output_cap"] == 32
+    for prompt in ("Use both GPUs.", "Run two things in parallel.", "Benchmark both GPUs.", "Run PowerShell on both GPUs.", "Delete two files concurrently.", "Stress the P100 and 4090.", "Run two tasks on an A100 and a P100."):
+        assert detect_bounded_local_text_intent({"model": "estate/grace"}, prompt)["state"] == "execution_blocked"
+
+
+def test_parallel_executor_uses_two_existing_single_task_paths(monkeypatch, tmp_path):
+    calls = []
+    def fake_single(payload, *, user_message, session_id, root, runtime_lane_id):
+        calls.append((payload["metadata"]["parallel_task_id"], user_message, runtime_lane_id))
+        return {"state": "execution_completed", "provider_execution_performed": True, "objective": {"objective_id": calls[-1][0]}}
+    monkeypatch.setattr("estate.core.openwebui_engineering_workflow.execute_bounded_local_text_from_chat", fake_single)
+    prompt = "Run two independent governed local text tasks concurrently and return a short result from each."
+    result = execute_parallel_bounded_local_text_from_chat({"model": "estate/grace"}, user_message=prompt, session_id="parallel-test", root=tmp_path)
+    assert result["state"] == "execution_completed"
+    assert {item[0] for item in calls} == {"rtx4090", "p100"}
+    assert {item[2] for item in calls} == {"qwen.local.text.4090", "qwen.local.text.p100-1"}
+
+
+def test_bounded_trace_records_gateway_safe_hash_and_two_task_router(tmp_path):
+    payload = {"model": "estate/grace", "stream": True, "metadata": {"session_id": "trace-session"}, "messages": [{"role": "user", "content": "secret prompt"}]}
+    correlation = bounded_trace_id(payload)
+    record_bounded_parallel_trace(tmp_path, "gateway_request_entry", correlation_id=correlation, request_body_hash="hash-only")
+    record_bounded_parallel_trace(tmp_path, "parallel_router_invocation", correlation_id=correlation, task_spec_count=2, task_specs=[{"task_index": 0}, {"task_index": 1}])
+    lines = (tmp_path / "runtime/diagnostics/bounded_parallel_invocations.jsonl").read_text(encoding="utf-8").splitlines()
+    assert len(lines) == 2
+    assert all("secret prompt" not in line for line in lines)
+    assert all(json.loads(line)["correlation_id"] == "trace-session" for line in lines)
+    assert json.loads(lines[1])["task_spec_count"] == 2
+
+
+def test_bounded_trace_write_failure_is_best_effort(monkeypatch, tmp_path):
+    monkeypatch.setattr("pathlib.Path.open", lambda *args, **kwargs: (_ for _ in ()).throw(OSError("diagnostic unavailable")))
+    record_bounded_parallel_trace(tmp_path, "reservation_attempt_before", correlation_id="trace-failure")
+
+
+def test_explicit_registered_lane_resolution_is_authoritative_and_validated(tmp_path):
+    uuid = "GPU-46f3fd00-5454-4536-4196-5d8b727e14f2"
+    resource_id = f"DESKTOP-JA3RPNQ:nvidia:{uuid}"
+    observation = ComputeResourceObservation(resource_id=resource_id, host_id="DESKTOP-JA3RPNQ", nvidia_uuid=uuid, name="NVIDIA GeForce RTX 4090", health_state="healthy", capacity_state="available")
+    lane = RuntimeLane(runtime_lane_id="qwen.local.text.4090", provider_id="qwen.local.text", endpoint_type="ollama-http", endpoint_address="http://127.0.0.1:12409", host_id="DESKTOP-JA3RPNQ", compute_resource_id=resource_id, gpu_uuid=uuid, model_identity="qwen3:8b", environment_binding={"CUDA_VISIBLE_DEVICES": uuid, "OLLAMA_HOST": "127.0.0.1:12409"}, provider_config_path="config/providers/qwen_local_text.json", minimum_vram_mib=8192)
+    (tmp_path / "config/providers").mkdir(parents=True)
+    (tmp_path / "config/providers/qwen_local_text.json").write_text('{"minimum_safe_vram_mib": 8192}', encoding="utf-8")
+    import estate.core.openwebui_engineering_workflow as workflow
+    original = workflow.load_registered_lanes
+    workflow.load_registered_lanes = lambda root: [lane]
+    try:
+        selected = _target_registered_lane(tmp_path, [observation], "qwen.local.text.4090")
+        assert selected[0].runtime_lane_id == "qwen.local.text.4090"
+        assert selected[2].nvidia_uuid == uuid
+        assert _target_registered_lane(tmp_path, [observation], "qwen.local.text.unknown") is None
+    finally:
+        workflow.load_registered_lanes = original
 
 
 def test_bounded_prompt_with_runtime_keywords_bypasses_read_only_runtime_layer():

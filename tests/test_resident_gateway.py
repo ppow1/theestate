@@ -1,6 +1,43 @@
 from estate.core.resident_gateway import models_payload, chat_completion, chat_completion_stream
 
 
+def test_grace_task_followup_is_non_executable(monkeypatch, tmp_path):
+    def fail_if_called(*args, **kwargs):
+        raise AssertionError("task follow-up must not enter Grace execution")
+
+    monkeypatch.setattr("estate.core.resident_gateway._streaming_chat_completion", fail_if_called)
+    monkeypatch.setattr("estate.core.resident_gateway._non_streaming_chat_completion", fail_if_called)
+    code, body = chat_completion(
+        {
+            "model": "estate/grace",
+            "messages": [{"role": "user", "content": "Generate a concise title for this bounded local task."}],
+            "metadata": {"task": "title_generation", "chat_id": "chat-1"},
+        },
+        root=tmp_path,
+    )
+    assert code == 200
+    assert body["estate"] == {"resident_id": "grace", "task_request": True, "task": "title_generation", "execution_performed": False}
+    assert body["choices"][0]["message"]["role"] == "assistant"
+
+
+def test_grace_task_followup_does_not_execute_parallel_prompt(monkeypatch, tmp_path):
+    def fail_if_called(*args, **kwargs):
+        raise AssertionError("embedded user prompt must not be replayed")
+
+    monkeypatch.setattr("estate.core.resident_gateway._streaming_chat_completion", fail_if_called)
+    monkeypatch.setattr("estate.core.resident_gateway._non_streaming_chat_completion", fail_if_called)
+    code, body = chat_completion(
+        {
+            "model": "estate/grace",
+            "messages": [{"role": "user", "content": "Generate a title for: run two small independent governed local text tasks at the same time."}],
+            "metadata": {"task": "title_generation", "chat_id": "chat-2"},
+        },
+        root=tmp_path,
+    )
+    assert code == 200
+    assert body["estate"]["execution_performed"] is False
+
+
 def test_models_expose_active_residents_include_commissioned_grace():
     ids = {m['id'] for m in models_payload()['data']}
     assert {'estate/alfred', 'estate/helen', 'estate/ingrid', 'estate/grace'} <= ids

@@ -10,10 +10,12 @@ from __future__ import annotations
 
 from pathlib import Path
 from typing import Any
+from concurrent.futures import ThreadPoolExecutor
 import hashlib
 import json
 import os
 import re
+import threading
 from uuid import uuid4
 
 from estate.core.compute_resources import ComputeReservationLedger, ComputeResourceRequirements, collect_nvidia_smi, select_resource, write_compute_projection
@@ -38,6 +40,18 @@ BOUNDED_TEXT_PREFIXES = (
     "run a bounded local text task",
     "execute a bounded local text task",
 )
+BOUNDED_TEXT_ACTION_PATTERN = re.compile(r"\b(?:run|execute|use)\b", re.I)
+BOUNDED_TEXT_SIZE_PATTERN = re.compile(r"\b(?:small|tiny|bounded)\b", re.I)
+BOUNDED_TEXT_LOCAL_PATTERN = re.compile(r"\blocal(?:ly)?\b", re.I)
+BOUNDED_TEXT_TASK_PATTERN = re.compile(r"\b(?:text(?:[- ]generation)?|generation)\s*task\b|\btext execution\b", re.I)
+BOUNDED_TEXT_GOVERNED_PATTERN = re.compile(r"\bgoverned\b", re.I)
+UNSAFE_LOCAL_ACTION_PATTERN = re.compile(r"\b(?:benchmark|stress|delete|remove|powershell|shell)\b", re.I)
+PARALLEL_COUNT_PATTERN = re.compile(r"\b(?:two|2|pair\s+of)\b", re.I)
+PARALLEL_CONCURRENCY_PATTERN = re.compile(r"\b(?:concurrent(?:ly)?|parallel|at\s+the\s+same\s+time|simultaneous(?:ly)?)\b", re.I)
+PARALLEL_TASK_PATTERN = re.compile(r"\b(?:local\s+)?text(?:[- ]generation)?\s+tasks?\b|\btext execution\b", re.I)
+PARALLEL_GOVERNED_PATTERN = re.compile(r"\bgoverned\b|\bqualified\s+(?:gpu\s+)?lanes?\b", re.I)
+PARALLEL_QUALIFIED_LANE_PATTERN = re.compile(r"\b(?:4090|p100)\b", re.I)
+PARALLEL_UNKNOWN_LANE_PATTERN = re.compile(r"\b(?:a100|v100|t4|3090|p40|other\s+gpu|both\s+gpus)\b", re.I)
 P100_RESOURCE_PATTERNS = (
     re.compile(r"\bgoverned\s+p100\s+compute\s+(?:lane|resource)\b", re.I),
     re.compile(r"\btesla\s+p100\b", re.I),
@@ -45,10 +59,45 @@ P100_RESOURCE_PATTERNS = (
 )
 RAW_PLACEMENT_PATTERN = re.compile(r"\bGPU-[0-9a-f]{8,}(?:-[0-9a-f-]+)?\b|\bqwen\.local\.text\.[a-z0-9.-]+\b", re.I)
 UNRESOLVED_PLACEMENT_PATTERN = re.compile(r"\b(?:use|using|run\s+on|execute\s+on)\b.{0,80}\b(?:gpu|compute\s+(?:lane|resource)|tesla|rtx)\b", re.I)
+BOUNDED_TRACE_PATH = "runtime/diagnostics/bounded_parallel_invocations.jsonl"
 
 
 def _root(root: Path | None = None) -> Path:
     return root or (ESTATE_ROOT if ESTATE_ROOT.exists() else Path.cwd())
+
+
+def bounded_trace_id(payload: dict[str, Any]) -> str:
+    metadata = payload.get("metadata") if isinstance(payload.get("metadata"), dict) else {}
+    trace_id = payload.get("id") or metadata.get("bounded_trace_id") or metadata.get("session_id") or payload.get("session_id")
+    if not trace_id:
+        trace_id = f"bounded-{uuid4().hex}"
+    metadata["bounded_trace_id"] = str(trace_id)
+    payload["metadata"] = metadata
+    return str(trace_id)
+
+
+def _bounded_request_hash(payload: dict[str, Any]) -> str:
+    metadata = payload.get("metadata") if isinstance(payload.get("metadata"), dict) else {}
+    messages = []
+    for message in payload.get("messages") or []:
+        if isinstance(message, dict):
+            content = str(message.get("content") or "")
+            messages.append({"role": message.get("role"), "content_sha256": hashlib.sha256(content.encode("utf-8")).hexdigest()})
+    safe = {"model": payload.get("model"), "stream": payload.get("stream"), "id": payload.get("id"), "session_id": metadata.get("session_id") or payload.get("session_id"), "messages": messages}
+    return hashlib.sha256(json.dumps(safe, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+
+
+def record_bounded_parallel_trace(root: Path | None, event: str, *, correlation_id: str, **fields: Any) -> None:
+    """Best-effort internal evidence; never changes governed execution semantics."""
+    try:
+        base = _root(root)
+        path = base / BOUNDED_TRACE_PATH
+        path.parent.mkdir(parents=True, exist_ok=True)
+        record = {"event": event, "correlation_id": correlation_id, "timestamp": utc_now(), "pid": os.getpid(), "thread_id": threading.get_ident(), **fields}
+        with path.open("a", encoding="utf-8") as stream:
+            stream.write(json.dumps(record, sort_keys=True) + "\n")
+    except Exception:
+        return
 
 
 def _provider_config(root: Path, relative: str) -> dict[str, Any] | None:
@@ -107,6 +156,27 @@ def _target_symbolic_lane(root: Path, observations: list[Any], symbol: str) -> t
     return (lane, config, physical) if lane and config else None
 
 
+def _target_registered_lane(root: Path, observations: list[Any], runtime_lane_id: str) -> tuple[Any, dict[str, Any], Any] | None:
+    """Resolve an explicit lane only through the canonical registry and live resource evidence."""
+    if not isinstance(runtime_lane_id, str) or not runtime_lane_id.strip():
+        return None
+    lanes = load_registered_lanes(root)
+    lane = next((item for item in lanes if item.runtime_lane_id == runtime_lane_id.strip()), None)
+    if lane is None or lane.provider_id != "qwen.local.text":
+        return None
+    config = _provider_config(root, lane.provider_config_path)
+    selected = next(
+        (
+            row
+            for row in observations
+            if row.nvidia_uuid == lane.gpu_uuid
+            and row.resource_id == lane.compute_resource_id
+        ),
+        None,
+    )
+    return (lane, config, selected) if config and selected else None
+
+
 def detect_engineering_assignment_command(payload: dict[str, Any], user_message: str) -> dict[str, Any] | None:
     """Return command metadata when a chat turn explicitly requests assignment initiation."""
     metadata = payload.get("metadata") if isinstance(payload.get("metadata"), dict) else {}
@@ -131,11 +201,64 @@ def detect_bounded_local_text_intent(payload: dict[str, Any], user_message: str)
         lowered = lowered.split(":", 1)[1] if lowered.startswith("grace:") else lowered.split(",", 1)[1].lstrip()
     if model not in {"estate/grace", "estate/grace-grounded-test"}:
         return {"state": "conversation_only", "reason": "resident is not Grace"}
+    if UNSAFE_LOCAL_ACTION_PATTERN.search(lowered):
+        return {"state": "execution_blocked", "reason": "unsafe local action is outside bounded text-task execution"}
+    parallel_bounded_text = (
+        PARALLEL_COUNT_PATTERN.search(lowered)
+        and PARALLEL_CONCURRENCY_PATTERN.search(lowered)
+        and PARALLEL_TASK_PATTERN.search(lowered)
+        and PARALLEL_GOVERNED_PATTERN.search(lowered)
+        and (BOUNDED_TEXT_LOCAL_PATTERN.search(lowered) or PARALLEL_QUALIFIED_LANE_PATTERN.search(lowered))
+    )
+    if parallel_bounded_text:
+        if PARALLEL_UNKNOWN_LANE_PATTERN.search(lowered):
+            return {"state": "execution_blocked", "reason": "parallel request names an unsupported or ambiguous runtime lane"}
+        return {
+            "state": "execution_requested",
+            "intent": "parallel_bounded_local_text",
+            "source": "semantic_parallel_chat_intent",
+            "task_specs": _parallel_bounded_text_task_specs(),
+        }
     if any(lowered.startswith(prefix) for prefix in BOUNDED_TEXT_PREFIXES):
         return {"state": "execution_requested", "intent": "bounded_local_text", "source": "explicit_chat_prefix"}
-    if "execute" in lowered or "run " in lowered:
+    semantic_bounded_text = all(
+        pattern.search(lowered)
+        for pattern in (
+            BOUNDED_TEXT_ACTION_PATTERN,
+            BOUNDED_TEXT_SIZE_PATTERN,
+            BOUNDED_TEXT_LOCAL_PATTERN,
+            BOUNDED_TEXT_TASK_PATTERN,
+        )
+    ) and (BOUNDED_TEXT_GOVERNED_PATTERN.search(lowered) or re.search(r"\btext[- ]generation\b", lowered))
+    if semantic_bounded_text and not UNSAFE_LOCAL_ACTION_PATTERN.search(lowered):
+        return {"state": "execution_requested", "intent": "bounded_local_text", "source": "semantic_chat_intent"}
+    if BOUNDED_TEXT_ACTION_PATTERN.search(lowered):
         return {"state": "execution_blocked", "reason": "execution wording is ambiguous; use an explicit bounded local text task request"}
     return {"state": "conversation_only", "reason": "no executable intent detected"}
+
+
+def _parallel_bounded_text_task_specs() -> list[dict[str, Any]]:
+    """Return the fixed, already-qualified two-lane UI parallel contract."""
+    return [
+        {
+            "task_id": "rtx4090",
+            "runtime_lane_id": "qwen.local.text.4090",
+            "gpu_symbol": "rtx4090",
+            "model": "qwen3:8b",
+            "context_limit": None,
+            "output_cap": None,
+            "concurrency": 1,
+        },
+        {
+            "task_id": "p100",
+            "runtime_lane_id": "qwen.local.text.p100-1",
+            "gpu_symbol": "p100",
+            "model": "llama3.2:3b",
+            "context_limit": 1024,
+            "output_cap": 32,
+            "concurrency": 1,
+        },
+    ]
 
 
 def _readiness_event(rootp: Path, objective: GraceObjective) -> dict[str, Any]:
@@ -158,7 +281,11 @@ def _readiness_event(rootp: Path, objective: GraceObjective) -> dict[str, Any]:
     )
 
 
-def execute_bounded_local_text_from_chat(payload: dict[str, Any], *, user_message: str, session_id: str | None = None, root: Path | None = None) -> dict[str, Any] | None:
+def execute_bounded_local_text_from_chat(payload: dict[str, Any], *, user_message: str, session_id: str | None = None, root: Path | None = None, runtime_lane_id: str | None = None) -> dict[str, Any] | None:
+    correlation_id = bounded_trace_id(payload)
+    metadata_for_trace = payload.get("metadata") if isinstance(payload.get("metadata"), dict) else {}
+    executor_invocation_id = f"exec-{uuid4().hex}"
+    record_bounded_parallel_trace(root, "executor_invocation", correlation_id=correlation_id, executor_invocation_id=executor_invocation_id, task_index=metadata_for_trace.get("parallel_task_index"), runtime_lane_id=runtime_lane_id or metadata_for_trace.get("parallel_runtime_lane_id"), session_id=session_id, caller="execute_bounded_local_text_from_chat")
     intent = detect_bounded_local_text_intent(payload, user_message)
     if intent["state"] != "execution_requested":
         return intent if intent["state"] == "execution_blocked" else None
@@ -171,10 +298,18 @@ def execute_bounded_local_text_from_chat(payload: dict[str, Any], *, user_messag
     if not observations:
         return {"state": "execution_blocked", "reason": "fresh physical compute evidence is unavailable", "provider_execution_performed": False}
     write_compute_projection(observations, rootp)
-    resource_intent = detect_bounded_compute_resource_intent(user_message)
-    if resource_intent["state"] == "blocked":
-        return {"state": "execution_blocked", "reason": resource_intent["reason"], "resource_intent": resource_intent, "provider_execution_performed": False}
-    target = _target_symbolic_lane(rootp, observations, resource_intent["symbol"]) if resource_intent["state"] == "required" else _target_lane(rootp, observations)
+    metadata = payload.get("metadata") if isinstance(payload.get("metadata"), dict) else {}
+    explicit_lane_id = runtime_lane_id or metadata.get("parallel_runtime_lane_id")
+    if explicit_lane_id is not None:
+        resource_intent = {"state": "required", "source": "validated_runtime_lane", "runtime_lane_id": explicit_lane_id}
+        target = _target_registered_lane(rootp, observations, explicit_lane_id)
+        if target is None:
+            return {"state": "execution_blocked", "reason": "explicit runtime lane is unknown, unavailable, or not registered for qwen.local.text", "resource_intent": resource_intent, "provider_execution_performed": False}
+    else:
+        resource_intent = detect_bounded_compute_resource_intent(user_message)
+        if resource_intent["state"] == "blocked":
+            return {"state": "execution_blocked", "reason": resource_intent["reason"], "resource_intent": resource_intent, "provider_execution_performed": False}
+        target = _target_symbolic_lane(rootp, observations, resource_intent["symbol"]) if resource_intent["state"] == "required" else _target_lane(rootp, observations)
     if not target:
         return {"state": "execution_blocked", "reason": "governed local-text target lane or its physical resource is unavailable", "resource_intent": resource_intent, "provider_execution_performed": False}
     lane, config, target_observation = target
@@ -194,6 +329,7 @@ def execute_bounded_local_text_from_chat(payload: dict[str, Any], *, user_messag
     if lane_readiness.get("status") != "READY":
         return {"state": "execution_blocked", "reason": lane_readiness.get("reason", "selected runtime lane could not be made ready"), "lane_id": lane.runtime_lane_id, "lane_health": lane_health, "lane_readiness": lane_readiness, "provider_execution_performed": False}
     objective = GraceObjective.create(requested_by="Steward via Open WebUI", title="Bounded local text task", summary=user_message.strip(), work_package_id="WP-0649", owner="qwen-local-text", checkpoint="Grace records provider receipt and physical placement evidence; acceptance remains with Engineering and the Steward.", metadata={"summary_safe": True, "openwebui_bounded_local_text": True, "resource_intent": resource_intent, "compute_resource_requirements": requirements.to_dict()})
+    record_bounded_parallel_trace(rootp, "executor_objective_created", correlation_id=correlation_id, executor_invocation_id=executor_invocation_id, task_index=metadata_for_trace.get("parallel_task_index"), objective_id=objective.objective_id, runtime_lane_id=lane.runtime_lane_id, resource_id=selected.resource_id, required_gpu_uuid=lane.gpu_uuid)
     artifact_path = f"docs/operations/examples/grace_bounded_local_text_{objective.objective_id}.md"
     receipt_path = f"runtime/engineering_adapter_receipts/grace_bounded_local_text_{objective.objective_id}.json"
     provider_config_path = lane.provider_config_path
@@ -210,7 +346,15 @@ def execute_bounded_local_text_from_chat(payload: dict[str, Any], *, user_messag
     determination = comp.determine_capability(inquiry["capability_request_id"], disposition="qualified_and_available", worker_profile_id="qwen-local-text", qualification_evidence=[provider_config_path, str(health_path.relative_to(rootp)).replace("\\", "/")], availability_evidence=[str(health_path.relative_to(rootp)).replace("\\", "/")], capacity_evidence=["runtime/compute_resources/gpus.json"], provider_health_evidence=[str(health_path.relative_to(rootp)).replace("\\", "/")], evidence_observed_at=utc_now())
     event = _readiness_event(rootp, objective)
     reservation_id = f"gpu-reservation-{objective.objective_id}"
-    ComputeReservationLedger(rootp).reserve(reservation_id=reservation_id, resource_id=selected.resource_id, workload_id=objective.objective_id, minimum_vram_mib=requirements.minimum_vram_mib)
+    ledger = ComputeReservationLedger(rootp)
+    existing = [row for row in ledger.active() if row.get("resource_id") == selected.resource_id]
+    record_bounded_parallel_trace(rootp, "reservation_attempt_before", correlation_id=correlation_id, executor_invocation_id=executor_invocation_id, task_index=metadata_for_trace.get("parallel_task_index"), objective_id=objective.objective_id, runtime_lane_id=lane.runtime_lane_id, resource_id=selected.resource_id, required_gpu_uuid=lane.gpu_uuid, reservation_id=reservation_id, existing_reservations=existing, caller="execute_bounded_local_text_from_chat")
+    try:
+        reservation = ledger.reserve(reservation_id=reservation_id, resource_id=selected.resource_id, workload_id=objective.objective_id, minimum_vram_mib=requirements.minimum_vram_mib)
+    except Exception as exc:
+        record_bounded_parallel_trace(rootp, "reservation_attempt_after", correlation_id=correlation_id, executor_invocation_id=executor_invocation_id, task_index=metadata_for_trace.get("parallel_task_index"), objective_id=objective.objective_id, runtime_lane_id=lane.runtime_lane_id, resource_id=selected.resource_id, required_gpu_uuid=lane.gpu_uuid, reservation_id=reservation_id, success=False, exception_type=type(exc).__name__, exception_message=str(exc), existing_reservations=existing, caller="execute_bounded_local_text_from_chat")
+        raise
+    record_bounded_parallel_trace(rootp, "reservation_attempt_after", correlation_id=correlation_id, executor_invocation_id=executor_invocation_id, task_index=metadata_for_trace.get("parallel_task_index"), objective_id=objective.objective_id, runtime_lane_id=lane.runtime_lane_id, resource_id=selected.resource_id, required_gpu_uuid=lane.gpu_uuid, reservation_id=reservation_id, success=True, reservation=reservation, caller="execute_bounded_local_text_from_chat")
     requirements = ComputeResourceRequirements(**{**requirements.__dict__, "required_gpu_uuid": selected.nvidia_uuid, "required_resource_id": selected.resource_id, "reservation_reference": reservation_id, "evidence_reference": "runtime/compute_resources/gpus.json"})
     try:
         governed = comp.governed_commission_and_dispatch(objective.objective_id, determination["determination_id"], grace_action_id=action.action_id, operations_decision_id=action_record["metadata"]["operations_decision_id"], bounded_objective=objective.summary, acceptance_criteria=["one bounded text artifact", "one provider receipt", "allocated UUID equals runtime lane UUID"], ptm_source_high_watermark=event["event_id"], ptm_task_or_package_id=f"task-{objective.objective_id}", enabling_project_id="project-local-text", provider_id="qwen.local.text", provider_type="execution", adapter_reference="qwen-local-ollama-text-adapter@1.0.0", execution_metadata=authority, compute_resource_requirements=requirements.to_dict(), idempotency_key=f"grace-bounded-text:{objective.objective_id}")
@@ -218,6 +362,48 @@ def execute_bounded_local_text_from_chat(payload: dict[str, Any], *, user_messag
     finally:
         ComputeReservationLedger(rootp).release(reservation_id)
     return {"state": "execution_completed" if execution.get("status") == "completed" else "execution_failed", "intent": intent, "objective": objective.to_dict(), "grace_action": action.to_dict(), "placement": placement, "lane": lane.to_dict(), "governed": governed, "execution": execution, "provider_execution_performed": execution.get("status") == "completed", "session_id": session_id}
+
+
+def execute_parallel_bounded_local_text_from_chat(payload: dict[str, Any], *, user_message: str, session_id: str | None = None, root: Path | None = None) -> dict[str, Any] | None:
+    """Run exactly the two qualified local-text lanes through the existing governed executor."""
+    intent = detect_bounded_local_text_intent(payload, user_message)
+    if intent.get("state") != "execution_requested" or intent.get("intent") != "parallel_bounded_local_text":
+        return intent if intent.get("state") == "execution_blocked" else None
+    specs = intent["task_specs"]
+    task_messages = {
+        "rtx4090": "Run a small governed local text task and return one short result.",
+        "p100": "Run a small governed local text task using the governed P100 compute lane and return one short result.",
+    }
+
+    def run(spec: dict[str, Any]) -> dict[str, Any]:
+        task_payload = dict(payload)
+        metadata = dict(payload.get("metadata") or {})
+        metadata["parallel_task_id"] = spec["task_id"]
+        metadata["parallel_task_index"] = specs.index(spec)
+        metadata["parallel_runtime_lane_id"] = spec["runtime_lane_id"]
+        task_payload["metadata"] = metadata
+        return execute_bounded_local_text_from_chat(
+            task_payload,
+            user_message=task_messages[spec["task_id"]],
+            session_id=session_id,
+            root=root,
+            runtime_lane_id=spec["runtime_lane_id"],
+        ) or {"state": "execution_blocked", "reason": "parallel task returned no governed result", "provider_execution_performed": False}
+
+    correlation_id = bounded_trace_id(payload)
+    record_bounded_parallel_trace(root, "parallel_router_invocation", correlation_id=correlation_id, task_spec_count=len(specs), task_specs=[{"task_index": index, "task_id": spec["task_id"], "runtime_lane_id": spec["runtime_lane_id"]} for index, spec in enumerate(specs)], caller="execute_parallel_bounded_local_text_from_chat")
+    with ThreadPoolExecutor(max_workers=2, thread_name_prefix="grace-parallel-text") as pool:
+        results = list(pool.map(run, specs))
+    completed = all(item.get("state") == "execution_completed" for item in results)
+    return {
+        "state": "execution_completed" if completed else "execution_failed",
+        "intent": intent,
+        "parallel": True,
+        "task_specs": specs,
+        "tasks": results,
+        "provider_execution_performed": completed,
+        "session_id": session_id,
+    }
 
 
 def initiate_engineering_assignment_from_chat(
